@@ -61,3 +61,17 @@ class StoresList extends ItemsList {
     'storeName' : storeName
   };
 }
+
+class User {
+  final String id;
+  final String username;
+  final String password;
+
+  User({required this.id,required this.username,required this.password});
+
+  Map<String, dynamic> toJson() => {
+    'id' : id,
+    'username' : username,
+    'password' : password,
+  };
+}
