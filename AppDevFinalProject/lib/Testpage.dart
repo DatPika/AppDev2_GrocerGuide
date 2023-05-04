@@ -8,6 +8,8 @@ var i = Item(itemName: "corn", itemType: 'vegetable', itemCost: 50);
 var i2 = Item(itemName: "pita", itemType: 'bread');
 var i3 = Item(itemName: "apple", itemType: 'fruit', itemCost: 50);
 var i4 = Item(itemName: "chips", itemType: 'not good', itemCost: 50);
+var i5 = Item(itemName: "beverage", itemType: 'water', itemCost: 50);
+var i6 = Item(itemName: "beverage", itemType: 'wine', itemCost: 50);
 late List<Item> itemList = [i, i2, i3, i4];
 
 var d = Item(itemName: "corn", itemType: 'vegetable', itemCost: 10);
@@ -57,13 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             ElevatedButton(onPressed: () {
-              db.createItem(i);
+              db.createItem(i5);
             }, child: Text('Create'),),
             ElevatedButton(onPressed: () {
               db.readItem("Pita");
             }, child: Text('Read'),),
             ElevatedButton(onPressed: () {
-              db.updateItem(Item(itemName: "Pita", itemType: "Not Bread", itemCost: 3.22));
+              db.updateItem(i6);
             }, child: Text('Update'),),
             ElevatedButton(onPressed: () {
               db.deleteItem('Pita');

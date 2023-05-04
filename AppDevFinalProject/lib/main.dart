@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Model.dart';
 import 'dbhelper.dart';
+import './settings.dart';
+import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -166,11 +168,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
             alignment: Alignment.center,
           ),
-          Text(
-            'Bob Beans',
-            style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
-          ),
-          Text('emailheaha@gmail.com', style: TextStyle(fontSize: 20)),
+          // Text(
+          //   'Bob Beans',
+          //   style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
+          // ),
+          Text(FirebaseAuth.instance.currentUser!.email.toString(), style: TextStyle(fontSize: 20)),
           SizedBox(
             height: 30,
           ),
@@ -182,7 +184,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
             style: ElevatedButton.styleFrom(primary: Colors.red),
             child: Text(
               'Sign out',
@@ -202,10 +206,70 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  ColorSwatch? _tempMainColor;
+  Color? _tempShadeColor;
+  ColorSwatch? _mainColor = Colors.lightGreen;
+  Color? _shadeColor = Colors.lightGreen[300];
+
+  void _openDialog(String title, Widget content) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          contentPadding: const EdgeInsets.all(6.0),
+          title: Text(title),
+          content: content,
+          actions: [
+            TextButton(
+              child: Text('CANCEL'),
+              onPressed: Navigator.of(context).pop,
+            ),
+            TextButton(
+              child: Text('SUBMIT'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() => _mainColor = _tempMainColor);
+                setState(() => _shadeColor = _tempShadeColor);
+                print('Main Color: $_mainColor\nShade Color: $_shadeColor');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openColorPicker() async {
+    _openDialog(
+      "Color picker",
+      MaterialColorPicker(
+        selectedColor: _shadeColor,
+        onColorChange: (color) => setState(() => _tempShadeColor = color),
+        onMainColorChange: (color) => setState(() => _tempMainColor = color),
+        onBack: () => print("Back button pressed"),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('This is settings'),
+      child: Column(
+        children: <Widget>[
+          //Picking a color theme
+          Container(
+              margin: EdgeInsets.only(top: 50),
+              child: Text(
+                  'Pick your color theme'
+              )
+          ),
+          OutlinedButton(
+            onPressed: _openColorPicker,
+            child: const Text('Pick Theme'),
+          )
+        ],
+      ),
     );
   }
 }
@@ -346,11 +410,11 @@ class _LoginState extends State<Login> {
           children: [
             Container(
               child: Text(
-                'Welcome to Grocelery',
+                'Welcome to Grocer Guide',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontFamily: 'Inspiration',
-                    fontSize: 75,
+                    fontSize: 65,
                     fontWeight: FontWeight.bold),
               ),
               alignment: Alignment.center,
