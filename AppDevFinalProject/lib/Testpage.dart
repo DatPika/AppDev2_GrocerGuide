@@ -5,7 +5,7 @@ import 'Model.dart';
 import 'dbhelper.dart';
 
 var i = Item(itemName: "corn", itemType: 'vegetable', itemCost: 50);
-var i2 = Item(itemName: "pita", itemType: 'bread', itemCost: 50);
+var i2 = Item(itemName: "pita", itemType: 'bread');
 var i3 = Item(itemName: "apple", itemType: 'fruit', itemCost: 50);
 var i4 = Item(itemName: "chips", itemType: 'not good', itemCost: 50);
 late List<Item> itemList = [i, i2, i3, i4];
@@ -57,18 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children:<Widget> [
-            ElevatedButton(onPressed: () {
-              db.createUser(User( username: "james", password: '123456789'));
-            }, child: Text('Create user'),),
-            ElevatedButton(onPressed: () {
-              db.readUser("james");
-            }, child: Text('Read user'),),
-            ElevatedButton(onPressed: () {
-              db.updateUser(User( username: "james", password: '1234'));
-            }, child: Text('Update user'),),
-            ElevatedButton(onPressed: () {
-              db.deleteUser('james');
-            }, child: Text('Delete user'),),
             
             // ElevatedButton(onPressed: () {
             //   db.createItem(i);
@@ -115,22 +103,22 @@ class _MyHomePageState extends State<MyHomePage> {
             //   db.deleteRecipiesList('foodToBuy');
             // }, child: Text('delete recipies list'),),
             //
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.createStoresList(StoresList(storeName: "hehhehe" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
-            // }, child: Text('create Stores list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.readStoresList('foodToBuy');
-            // }, child: Text('read Stores list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.updateStoresList(StoresList(storeName: "hohohohhehe",type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
-            // }, child: Text('update Stores list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.deleteStoresList('foodToBuy');
-            // }, child: Text('delete Stores list'),),
+
+            ElevatedButton(onPressed: () {
+              db.createStoresList(StoresList(storeName: "hehhehe" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+            }, child: Text('create Stores list'),),
+
+            ElevatedButton(onPressed: () {
+              db.readStoresList('foodToBuy');
+            }, child: Text('read Stores list'),),
+
+            ElevatedButton(onPressed: () {
+              db.updateStoresList(StoresList(storeName: "hohohohhehe",type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+            }, child: Text('update Stores list'),),
+
+            ElevatedButton(onPressed: () {
+              db.deleteStoresList('foodToBuy');
+            }, child: Text('delete Stores list'),),
 
           ],
         ),

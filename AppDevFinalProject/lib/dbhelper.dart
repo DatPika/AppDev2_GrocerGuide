@@ -4,52 +4,63 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Model.dart';
 
 class DatabaseHelper{
-  static final firestore = FirebaseFirestore.instance;
+  final firestore = FirebaseFirestore.instance;
   DatabaseHelper();
 
-  createUser(User user) async{
-    try {
-      if (firestore.collection('users').doc(user.username).get().toString() != user.username){
-        await firestore.collection('users').doc(user.username).set(
-            user.toJson()
-        );
-
-      }
-      else{
-        print('already exists');
-      }
-
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  readUser(String username) async {
-    DocumentSnapshot documentSnapshot;
-    try {
-      documentSnapshot =
-      await firestore.collection('users').doc(username).get();
-      print(documentSnapshot.data());
-    } catch (e){
-      print(e);
-    }
-  }
-
-  updateUser(User user) async {
-    try {
-      firestore.collection('users').doc(user.username).update(user.toJson());
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  deleteUser(String username) async {
-    try {
-      firestore.collection('users').doc(username).delete();
-    } catch (e){
-      print(e);
-    }
-  }
+  // createUser(User user) async{
+  //   try {
+  //     if (firestore.collection('users').doc(user.username).get().toString() != user.username){
+  //       await firestore.collection('users').doc(user.username).set(
+  //           user.toJson()
+  //       );
+  //
+  //     }
+  //     else{
+  //       print('already exists');
+  //     }
+  //
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+  //
+  // readUser(String username) async {
+  //   DocumentSnapshot documentSnapshot;
+  //   try {
+  //     documentSnapshot =
+  //     await firestore.collection('users').doc(username).get();
+  //     print(documentSnapshot.data());
+  //   } catch (e){
+  //     print(e);
+  //   }
+  // }
+  //
+  // // getPass(String username){
+  // //   DocumentSnapshot documentSnapshot;
+  // //   try {
+  // //     documentSnapshot =
+  // //         await firestore.collection('users').doc(username).get();
+  // //     print(documentSnapshot.data()username);
+  // //   } catch (e){
+  // //     print(e);
+  // //   }
+  // // }
+  //
+  // updateUser(User user) async {
+  //   try {
+  //     firestore.collection('users').doc(user.username).update(user.toJson());
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+  //
+  // deleteUser(String username) async {
+  //   try {
+  //     firestore.collection('users').doc(username).delete();
+  //   } catch (e){
+  //     print(e);
+  //   }
+  // }
 
   createItem(Item item) async{
     try {

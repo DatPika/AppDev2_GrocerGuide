@@ -1,6 +1,18 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-void main() => runApp(MyApp());
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'Model.dart';
+import 'dbhelper.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,7 +24,16 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         //fontFamily: 'Inspiration'
       ),
-      home: Login(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot){
+          if (snapshot.hasData){
+            return MyHomePage();
+          } else{
+            return Login();
+          }
+        },
+      ),
     );
   }
 }
@@ -384,7 +405,8 @@ class _LoginState extends State<Login> {
                   width: 300,
                   child: ElevatedButton(
                       onPressed: () {
-                        checkPassword(emailcontroller, passwordcontroller);
+                        signIn(emailcontroller, passwordcontroller);
+                        // checkPassword(emailcontroller, passwordcontroller);
                       },
                       child: Text(
                         'Sign in',
@@ -418,25 +440,42 @@ class _LoginState extends State<Login> {
         )),
       ),
     ));
+
   }
-
-  void checkPassword(TextEditingController id, TextEditingController password) {
-    String _username = 'Selihom';
-    String _password = '1';
-
-    if (_username == id.text && _password == password.text) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MyHomePage(),
-        ),
+  Future signIn(TextEditingController id, TextEditingController password) async{
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: id.text.trim(),
+          password: password.text.trim()
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid Credentials')),
-      );
+    } on FirebaseAuthException catch (e){
+      print(e);
     }
   }
+  // void checkPassword(TextEditingController id, TextEditingController password) async{
+  //   final db = new DatabaseHelper();
+  //   var user = await db.firestore.collection('users').doc(id.text).get();
+  //
+  //   if (user.exists) {
+  //     String data = db.readUser(id.text).toString();
+  //     Map<String, dynamic> valueMap = json.decode(data);
+  //     User user = new User.fromJson(valueMap);
+  //     var pass = user.password;
+  //
+  //     if(pass == password.text){
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => MyHomePage(),
+  //         ),
+  //       );
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Invalid Credentials')),
+  //     );
+  //   }
+  // }
 }
 
 class Register extends StatefulWidget {
