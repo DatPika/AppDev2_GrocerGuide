@@ -2,8 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
 void main() {
-  runApp(Settings());
+  runApp(SettingsSetup());
 }
+
+class SettingsSetup extends StatelessWidget {
+  const SettingsSetup({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.lightGreen),
+    // theme: ThemeData(
+    //   colorScheme: ColorScheme.fromSwatch().copyWith(
+    //     primary: _mainColor,
+    //     secondary: _shadeColor,
+    //   ),
+    // ),
+    title: 'Settings Page',
+    home: Settings()
+    );
+  }
+}
+
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);

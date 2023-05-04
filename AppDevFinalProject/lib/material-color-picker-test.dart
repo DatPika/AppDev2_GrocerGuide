@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
-void main() => runApp(HomeScreen());
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: "Material Color Picker",
+        theme: ThemeData(primarySwatch: Colors.blue),
+    home: HomeScreen()
+    );
+  }
+}
+
 
 class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
@@ -56,10 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Material Color Picker",
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: Scaffold(
+    return Scaffold(
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -69,7 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           ],
         ),
-      )
-    );
+      );
   }
 }

@@ -54,55 +54,53 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Flutter Firestore CRUD'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:<Widget> [
-            
-            // ElevatedButton(onPressed: () {
-            //   db.createItem(i);
-            // }, child: Text('Create'),),
-            // ElevatedButton(onPressed: () {
-            //   db.readItem("Pita");
-            // }, child: Text('Read'),),
-            // ElevatedButton(onPressed: () {
-            //   db.updateItem(Item(itemName: "Pita", itemType: "Not Bread", itemCost: 3.22));
-            // }, child: Text('Update'),),
-            // ElevatedButton(onPressed: () {
-            //   db.deleteItem('Pita');
-            // }, child: Text('Delete'),),
-            
-            // ElevatedButton(onPressed: () {
-            //   db.createItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
-            // }, child: Text('create list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.readItemsList('foodToBuy');
-            // }, child: Text('read list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.updateItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
-            // }, child: Text('update list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.deleteItemsList('foodToBuy');
-            // }, child: Text('delete list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.createRecipiesList(RecipiesList(imageId: "hehhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
-            // }, child: Text('create recipies list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.readRecipiesList('foodToBuy');
-            // }, child: Text('read recipies list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.updateRecipiesList(RecipiesList(imageId: "hohohohhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
-            // }, child: Text('update recipies list'),),
-            //
-            // ElevatedButton(onPressed: () {
-            //   db.deleteRecipiesList('foodToBuy');
-            // }, child: Text('delete recipies list'),),
-            //
+        child: ListView(
+          children: <Widget>[
+            ElevatedButton(onPressed: () {
+              db.createItem(i);
+            }, child: Text('Create'),),
+            ElevatedButton(onPressed: () {
+              db.readItem("Pita");
+            }, child: Text('Read'),),
+            ElevatedButton(onPressed: () {
+              db.updateItem(Item(itemName: "Pita", itemType: "Not Bread", itemCost: 3.22));
+            }, child: Text('Update'),),
+            ElevatedButton(onPressed: () {
+              db.deleteItem('Pita');
+            }, child: Text('Delete'),),
+
+            ElevatedButton(onPressed: () {
+              db.createItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+            }, child: Text('create list'),),
+
+            ElevatedButton(onPressed: () {
+              db.readItemsList('foodToBuy');
+            }, child: Text('read list'),),
+
+            ElevatedButton(onPressed: () {
+              db.updateItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+            }, child: Text('update list'),),
+
+            ElevatedButton(onPressed: () {
+              db.deleteItemsList('foodToBuy');
+            }, child: Text('delete list'),),
+
+            ElevatedButton(onPressed: () {
+              db.createRecipiesList(RecipiesList(imageId: "hehhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+            }, child: Text('create recipies list'),),
+
+            ElevatedButton(onPressed: () {
+              db.readRecipiesList('foodToBuy');
+            }, child: Text('read recipies list'),),
+
+            ElevatedButton(onPressed: () {
+              db.updateRecipiesList(RecipiesList(imageId: "hohohohhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+            }, child: Text('update recipies list'),),
+
+            ElevatedButton(onPressed: () {
+              db.deleteRecipiesList('foodToBuy');
+            }, child: Text('delete recipies list'),),
+
 
             ElevatedButton(onPressed: () {
               db.createStoresList(StoresList(storeName: "hehhehe" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
@@ -119,7 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(onPressed: () {
               db.deleteStoresList('foodToBuy');
             }, child: Text('delete Stores list'),),
-
           ],
         ),
       ),
