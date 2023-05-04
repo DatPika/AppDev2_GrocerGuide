@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dbhelper.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,17 +10,16 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
+        //fontFamily: 'Inspiration'
       ),
-      home: MyHomePage(),
+      home: Login(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 // class _MyHomePageState extends State<MyHomePage> {
@@ -56,11 +46,6 @@ class MyHomePage extends StatefulWidget {
 
 // }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
@@ -79,7 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grocelery'),
+        centerTitle: true,
+        title: Text('Grocelery', style: TextStyle(
+            fontFamily: 'Inspiration',
+            fontSize: 35,
+            fontWeight: FontWeight.bold),),
       ),
       drawer: NavigationDrawer(),
       body: _children[_currentIndex],
@@ -120,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+//Home Page
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -130,6 +120,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+//Profile Page
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -155,8 +146,8 @@ class _ProfilePageState extends State<ProfilePage> {
             alignment: Alignment.center,
           ),
           Text(
-            'Username',
-            style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+            'Bob Beans',
+            style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
           ),
           Text('emailheaha@gmail.com', style: TextStyle(fontSize: 20)),
           SizedBox(
@@ -183,6 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+//Settings Page
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -197,6 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
+// Navigation Bar
 class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({Key? key}) : super(key: key);
 
@@ -231,7 +224,11 @@ class NavigationDrawer extends StatelessWidget {
               children: [
                 Text(
                   'Grocelery',
-                  style: TextStyle(fontSize: 40, color: Colors.white),
+                  style: TextStyle(
+                      fontFamily: 'Inspiration',
+                      fontSize: 75,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ],
             ),
@@ -250,7 +247,11 @@ class NavigationDrawer extends StatelessWidget {
                 color: Colors.white,
               ),
               onTap: () {},
-              title: Text('Locations', style: TextStyle(color: Colors.white)),
+              title: Text('Locations',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Playball',
+                      fontSize: 30)),
               trailing: Icon(
                 Icons.arrow_right_outlined,
                 size: 30,
@@ -266,7 +267,8 @@ class NavigationDrawer extends StatelessWidget {
               onTap: () {},
               title: Text(
                 'Ingredients',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                    color: Colors.white, fontFamily: 'Playball', fontSize: 30),
               ),
               trailing: Icon(Icons.arrow_right_outlined,
                   size: 30, color: Colors.white),
@@ -281,7 +283,11 @@ class NavigationDrawer extends StatelessWidget {
                 color: Colors.white,
               ),
               onTap: () {},
-              title: Text('Recipes', style: TextStyle(color: Colors.white)),
+              title: Text('Recipes',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Playball',
+                      fontSize: 30)),
               trailing: Icon(Icons.arrow_right_outlined,
                   size: 30, color: Colors.white),
             ),
@@ -294,3 +300,254 @@ class NavigationDrawer extends StatelessWidget {
       );
 }
 
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  TextEditingController emailcontroller = TextEditingController();
+  TextEditingController passwordcontroller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SingleChildScrollView(
+      physics: NeverScrollableScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.all(50.0),
+        child: Center(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              child: Text(
+                'Welcome to Grocelery',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'Inspiration',
+                    fontSize: 75,
+                    fontWeight: FontWeight.bold),
+              ),
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(30),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: emailcontroller,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.black,
+                  labelText: 'Email',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: passwordcontroller,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.black,
+                  labelText: 'Password',
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => Home(username: username),
+                //   ),
+                // );
+              },
+              child: Text(
+                'Forgot Password?',
+                style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 20,
+                    fontFamily: 'Playball',
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                    child: SizedBox(
+                  height: 50,
+                  width: 300,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        checkPassword(emailcontroller, passwordcontroller);
+                      },
+                      child: Text(
+                        'Sign in',
+                        style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                      )),
+                ))),
+            Padding(
+                padding: EdgeInsets.all(1),
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Register(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Click to create an account!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 20,
+                          fontFamily: 'Playball',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                )),
+          ],
+        )),
+      ),
+    ));
+  }
+
+  void checkPassword(TextEditingController id, TextEditingController password) {
+    String _username = 'Selihom';
+    String _password = '1';
+
+    if (_username == id.text && _password == password.text) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePage(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid Credentials')),
+      );
+    }
+  }
+}
+
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
+
+  @override
+  State<Register> createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
+  TextEditingController usernamecontroller = TextEditingController();
+  TextEditingController emailcontroller = TextEditingController();
+  TextEditingController passwordcontroller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SingleChildScrollView(
+      physics: NeverScrollableScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.all(50.0),
+        child: Center(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              child: Text(
+                'Join to Grocelery',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'Inspiration',
+                    fontSize: 75,
+                    fontWeight: FontWeight.bold),
+              ),
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(30),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: usernamecontroller,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.black,
+                  labelText: 'Username',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: emailcontroller,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.black,
+                  labelText: 'Email',
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: passwordcontroller,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.black,
+                  labelText: 'Password',
+                ),
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                    child: SizedBox(
+                  height: 50,
+                  width: 300,
+                  child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Register',
+                        style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                      )),
+                ))),
+            Padding(
+                padding: EdgeInsets.all(1),
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Login(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Already have an account?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 20,
+                          fontFamily: 'Playball',
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                )),
+          ],
+        )),
+      ),
+    ));
+  }
+}
