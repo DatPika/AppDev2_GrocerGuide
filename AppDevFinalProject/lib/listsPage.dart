@@ -42,9 +42,41 @@ class _ListsState extends State<Lists> {
       body: Center(
         child: Column(
           children: <Widget>[
-            lists.forEach((element) {
-              _buildListCard();
-            })
+            Card(
+              child: Column(
+                children: <Widget>[
+                  Text('List Name'),
+                  Column(
+                    children: <Widget>[
+                      //TODO: add condition that allows for limited amount of items shown
+                      Text('Item1'),
+                      Text('Item2'),
+                      Text('Item3'),
+                      Text('Item4'),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Card(
+              child: Column(
+                children: <Widget>[
+                  Text('List Name 2'),
+                  Column(
+                    children: <Widget>[
+                      //TODO: add condition that allows for limited amount of items shown
+                      Text('Item1'),
+                      Text('Item2'),
+                      Text('Item3'),
+                      Text('Item4'),
+                      Text('Item5'),
+                      Text('Item6'),
+                      Text('Item7'),
+                    ],
+                  )
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -64,13 +96,13 @@ class _buildListCard extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Text('Lists'),
+          Text('List Name'),
           Column(
             children: <Widget>[
               //TODO: add condition that allows for limited amount of items shown
-              items.forEach((element) {
-                _buildItem(item: element);
-              })
+              // items.forEach((element) {
+              //   _buildItem(item: element);
+              // })
             ],
           )
         ],

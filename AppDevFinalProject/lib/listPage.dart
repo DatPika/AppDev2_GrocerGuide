@@ -38,14 +38,20 @@ class _ListState extends State<List> {
       appBar: AppBar(
         centerTitle: true,
         //TODO: add list name instead of just 'List'
-        title: Text('List'),
+        title: Text('List Name'),
       ),
       body: Center(
         child: Column(
           children: <Widget>[
-            list.forEach((element) {
-              _buildItem(item: element);
-            })
+            // list.forEach((element) {
+            //   _buildItem(item: element);
+            // })
+            Text('- Item1'),
+            Text('- Item2'),
+            Text('- Item3'),
+            Text('- Item4'),
+            Text('- Item5'),
+            Text('- Item6')
           ],
         ),
       ),

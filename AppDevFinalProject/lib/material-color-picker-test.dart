@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
 
-void main() {
-  runApp(Settings());
+void main() => runApp(HomeScreen());
+
+class HomeScreen extends StatefulWidget {
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
-
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
+class _HomeScreenState extends State<HomeScreen> {
+  // Use temp variable to only update color when press dialog 'submit' button
   ColorSwatch? _tempMainColor;
   Color? _tempShadeColor;
-  ColorSwatch? _mainColor = Colors.lightGreen;
-  Color? _shadeColor = Colors.lightGreen[300];
+  ColorSwatch? _mainColor = Colors.blue;
+  Color? _shadeColor = Colors.blue[800];
 
   void _openDialog(String title, Widget content) {
     showDialog(
@@ -61,38 +57,19 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.lightGreen),
-        // theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSwatch().copyWith(
-        //     primary: _mainColor,
-        //     secondary: _shadeColor,
-        //   ),
-        // ),
-        title: 'Settings Page',
-        home: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text('Settings'),
-          ),
-          body: Center(
-            child: Column(
-              children: <Widget>[
-                //Picking a color theme
-                Container(
-                    margin: EdgeInsets.only(top: 50),
-                    child: Text(
-                        'Pick your color theme'
-                    )
-                ),
-                OutlinedButton(
-                  onPressed: _openColorPicker,
-                  child: const Text('Pick Theme'),
-                )
-              ],
-            ),
-          ),
-        )
+      title: "Material Color Picker",
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+              onPressed: _openColorPicker,
+              child: const Text('Show color picker'),
+            )
+          ],
+        ),
+      )
     );
   }
 }
