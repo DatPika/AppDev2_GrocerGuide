@@ -18,11 +18,21 @@ class ItemsList{
   final String type;
   final String itemListTitle;
   final List<Item> itemList;
-  final double totalCost;
+  double totalCost = 0;
 
-  ItemsList({required this.type, required this.itemListTitle,required this.itemList,required this.totalCost});
+  _calculateTotalcost(){
+    itemList.forEach((e) {
+      if(e.itemCost != null){
+        totalCost += double.parse(e.itemCost.toString());
+      }
+    });
+  }
+  ItemsList({required this.type, required this.itemListTitle,required this.itemList}){
+    _calculateTotalcost();
+  }
 
   Map<String, dynamic> toJson() => {
+
     'type' : type,
     'itemListTitle' : itemListTitle,
     'itemList' : itemList.map((e) => e.toJson()).toList(),
@@ -34,8 +44,8 @@ class RecipiesList extends ItemsList{
   final String imageId;
   final String instructions;
 
-  RecipiesList({required String type, required String itemListTitle,required List<Item> itemList,required double totalCost, required this.imageId,required this.instructions})
-      : super(type: type, itemListTitle: itemListTitle, itemList: itemList, totalCost: totalCost);
+  RecipiesList({required String type, required String itemListTitle,required List<Item> itemList, required this.imageId,required this.instructions})
+      : super(type: type, itemListTitle: itemListTitle, itemList: itemList);
 
   Map<String, dynamic> toJson() => {
     'type' : type,
@@ -50,8 +60,8 @@ class RecipiesList extends ItemsList{
 class StoresList extends ItemsList {
   final String storeName;
 
-  StoresList({required String type, required String itemListTitle,required List<Item> itemList,required double totalCost, required this.storeName})
-      : super(type: type, itemListTitle: itemListTitle, itemList: itemList, totalCost: totalCost);
+  StoresList({required String type, required String itemListTitle,required List<Item> itemList, required this.storeName})
+      : super(type: type, itemListTitle: itemListTitle, itemList: itemList);
 
   Map<String, dynamic> toJson() => {
     'type' : type,
@@ -63,14 +73,12 @@ class StoresList extends ItemsList {
 }
 
 class User {
-  final String id;
   final String username;
   final String password;
 
-  User({required this.id,required this.username,required this.password});
+  User({required this.username,required this.password});
 
   Map<String, dynamic> toJson() => {
-    'id' : id,
     'username' : username,
     'password' : password,
   };
