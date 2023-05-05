@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,6 +10,7 @@ import 'Model.dart';
 import 'dbhelper.dart';
 import './settings.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+var db = new DatabaseHelper();
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -469,8 +471,7 @@ class _LoginState extends State<Login> {
                   width: 300,
                   child: ElevatedButton(
                       onPressed: () {
-                        signIn(emailcontroller, passwordcontroller);
-                        // checkPassword(emailcontroller, passwordcontroller);
+                        db.signIn(emailcontroller, passwordcontroller);
                       },
                       child: Text(
                         'Sign in',
@@ -506,16 +507,7 @@ class _LoginState extends State<Login> {
     ));
 
   }
-  Future signIn(TextEditingController id, TextEditingController password) async{
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: id.text.trim(),
-          password: password.text.trim()
-      );
-    } on FirebaseAuthException catch (e){
-      print(e);
-    }
-  }
+
   // void checkPassword(TextEditingController id, TextEditingController password) async{
   //   final db = new DatabaseHelper();
   //   var user = await db.firestore.collection('users').doc(id.text).get();
@@ -550,6 +542,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
+  final formKey = GlobalKey<FormState>();
   TextEditingController usernamecontroller = TextEditingController();
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
@@ -562,94 +555,121 @@ class _RegisterState extends State<Register> {
       child: Padding(
         padding: EdgeInsets.all(50.0),
         child: Center(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              child: Text(
-                'Join to Grocelery',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: 'Inspiration',
-                    fontSize: 75,
-                    fontWeight: FontWeight.bold),
-              ),
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(30),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: usernamecontroller,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.black,
-                  labelText: 'Username',
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: emailcontroller,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.black,
-                  labelText: 'Email',
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: passwordcontroller,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.black,
-                  labelText: 'Password',
-                ),
-              ),
-            ),
-            Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Center(
-                    child: SizedBox(
-                  height: 50,
-                  width: 300,
-                  child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Register',
-                        style: TextStyle(fontFamily: 'Playball', fontSize: 24),
-                      )),
-                ))),
-            Padding(
-                padding: EdgeInsets.all(1),
-                child: Center(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Login(),
-                        ),
-                      );
-                    },
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
                     child: Text(
-                      'Already have an account?',
+                      'Join to Grocelery',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 20,
-                          fontFamily: 'Playball',
-                          fontWeight: FontWeight.w500),
+                          fontFamily: 'Inspiration',
+                          fontSize: 75,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.all(30),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      controller: usernamecontroller,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.black,
+                        labelText: 'Username',
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (user) => user != null && user == ''
+                          ? 'Enter username'
+                          : null,
                     ),
                   ),
-                )),
-          ],
-        )),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      controller: emailcontroller,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.black,
+                        labelText: 'Email',
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (email) => email != null && !EmailValidator.validate(email)
+                          ? 'Enter a valid email'
+                          : null,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      controller: passwordcontroller,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.black,
+                        labelText: 'Password',
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (password) => password != null && password.length < 6
+                          ? 'Enter min. 6 characters'
+                          : null,
+                    ),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Center(
+                          child: SizedBox(
+                            height: 50,
+                            width: 300,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  final isValid = formKey.currentState!.validate();
+                                  if (isValid){
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Login(),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text(
+                                  'Register',
+                                  style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                                )),
+                          ))),
+                  Padding(
+                      padding: EdgeInsets.all(1),
+                      child: Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Login(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Already have an account?',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 20,
+                                fontFamily: 'Playball',
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )),
+                ],
+              ),
+            )
+        ),
       ),
     ));
   }

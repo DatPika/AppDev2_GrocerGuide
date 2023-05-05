@@ -1,4 +1,27 @@
 import 'dbhelper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+int getIntOrDefault(dynamic value) {
+  return value is int ? value : 0;
+}
+
+int getDoubleOrDefault(dynamic value) {
+  return value;
+}
+
+String getStringOrDefault(dynamic value) {
+  return value is String ? value : '';
+}
+
+List<Item> getItemList(dynamic value){
+  return value;
+}
+
+
 
 class Item{
   final String itemName;
@@ -38,6 +61,16 @@ class ItemsList{
     'itemList' : itemList.map((e) => e.toJson()).toList(),
     'totalCost' : totalCost
   };
+
+  factory ItemsList.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return ItemsList(
+      itemListTitle: getStringOrDefault(data["itemListTitle"]),
+      type: getStringOrDefault(data["type"]),
+      itemList: getItemList(data["itemList"]),
+    );
+  }
 }
 
 class RecipiesList extends ItemsList{
@@ -55,6 +88,18 @@ class RecipiesList extends ItemsList{
     'imageId' : imageId,
     'instructions' : instructions
   };
+
+  factory RecipiesList.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return RecipiesList(
+      itemListTitle: getStringOrDefault(data["itemListTitle"]),
+      imageId: getStringOrDefault(data["imageId"]),
+      instructions: getStringOrDefault(data["instructions"]),
+      type: getStringOrDefault(data["type"]),
+      itemList: getItemList(data["itemList"]),
+    );
+  }
 }
 
 class StoresList extends ItemsList {
@@ -70,22 +115,48 @@ class StoresList extends ItemsList {
     'totalCost' : totalCost,
     'storeName' : storeName
   };
+
+  factory StoresList.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return StoresList(
+      itemListTitle: getStringOrDefault(data["itemListTitle"]),
+      storeName: getStringOrDefault(data["storeName"]),
+      type: getStringOrDefault(data["type"]),
+      itemList: getItemList(data["itemList"]),
+    );
+  }
+
 }
 
-// class User {
-//   String username = "";
-//   String password = "";
-//
-//   User({required this.username,required this.password});
-//
-//   User.fromJson(Map<String, dynamic> json) {
-//     username = json['username'];
-//     password = json['password'];
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//     'username' : username,
-//     'password' : password,
-//   };
-//
-// }
+class UserA {
+  String username = "";
+  String email = "";
+  String password = "";
+
+  UserA({required this.username,required this.email, required this.password});
+
+  UserA.fromJson(Map<String, dynamic> json) {
+    username = json['username'];
+    password = json['password'];
+  }
+
+
+
+  factory UserA.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
+    return UserA(
+      username: getStringOrDefault(data["username"]),
+      email: getStringOrDefault(data["email"]),
+      password: getStringOrDefault(data["password"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'username' : username,
+    'email' : email,
+    'password' : password,
+  };
+
+}
