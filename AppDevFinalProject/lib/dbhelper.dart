@@ -9,7 +9,7 @@ class DatabaseHelper{
   final firestore = FirebaseFirestore.instance;
   DatabaseHelper();
 
-  Future signIn(TextEditingController id, TextEditingController password) async{
+  Future signIn(TextEditingController id, TextEditingController password, context) async{
     try {
       var usertype = await firestore.collection('users').doc(id.text.trim()).get();
       if (usertype.exists){
@@ -22,8 +22,12 @@ class DatabaseHelper{
 
       }
     } on FirebaseAuthException catch (e){
-      var u = new Utils();
-      return u.showSnackBar(e.message);
+      // var u = new Utils();
+      // return u.showSnackBar(e.message);
+      final snackBar = SnackBar(content: Text(e.message.toString()), backgroundColor: Colors.red,);
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
     }
   }
 
@@ -251,15 +255,15 @@ class DatabaseHelper{
   }
 
 }
+// class Utils {
+//   final messengerKey = GlobalKey<ScaffoldMessengerState>();
+//   showSnackBar(String? text){
+//     if (text == null) return;
+//
+//
+//
+//     messengerKey.currentState!..removeCurrentSnackBar()..showSnackBar(snackBar);
+//
+//   }
+// }
 
-class Utils {
-  final messengerKey = GlobalKey<ScaffoldMessengerState>();
-   showSnackBar(String? text){
-    if (text == null) return;
-    
-    final snackBar = SnackBar(content: Text(text), backgroundColor: Colors.red,);
-
-    messengerKey.currentState!..removeCurrentSnackBar()..showSnackBar(snackBar);
-
-  }
-}

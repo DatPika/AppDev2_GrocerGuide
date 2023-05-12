@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +32,7 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData){
             return MyHomePage();
           } else{
+            Navigator.of(context).pop;
             return Login();
           }
         },
@@ -47,35 +46,10 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-// class _MyHomePageState extends State<MyHomePage> {
-//   final db = new DatabaseHelper();
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Flutter Firestore CRUD'),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children:<Widget> [
-//             ElevatedButton(onPressed: db.create(), child: Text('Create'),),
-//             ElevatedButton(onPressed: db.read(), child: Text('Read'),),
-//             ElevatedButton(onPressed: db.update(), child: Text('Update'),),
-//             ElevatedButton(onPressed: db.delete(), child: Text('Delete'),),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-// }
-
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     HomePage(),
-    ProfilePage(),
     SettingsPage(),
   ];
 
@@ -110,15 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               activeIcon: Icon(Icons.home, color: Colors.white, size: 35),
               label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person_outline,
-              color: Colors.white,
-              size: 30,
-            ),
-            label: 'Profile',
-            activeIcon: Icon(Icons.person, color: Colors.white, size: 35),
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(
+          //     Icons.person_outline,
+          //     color: Colors.white,
+          //     size: 30,
+          //   ),
+          //   label: 'Profile',
+          //   activeIcon: Icon(Icons.person, color: Colors.white, size: 35),
+          // ),
           BottomNavigationBarItem(
             icon: Icon(
               Icons.settings_outlined,
@@ -156,51 +130,59 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Container(
-            height: 320,
-            width: 230,
-            child: Icon(
-              Icons.account_circle_rounded,
-              size: 230,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Profile page"),
+        backgroundColor: Colors.green,
+      ),
+      body:       Center(
+        child: Column(
+          children: [
+            Container(
+              height: 320,
+              width: 230,
+              child: Icon(
+                Icons.account_circle_rounded,
+                size: 230,
+              ),
+              decoration:
+              BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+              alignment: Alignment.center,
             ),
-            decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-            alignment: Alignment.center,
-          ),
-          // Text(
-          //   'Bob Beans',
-          //   style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
-          // ),
-          Text(FirebaseAuth.instance.currentUser!.email.toString(), style: TextStyle(fontSize: 20)),
-          SizedBox(
-            height: 30,
-          ),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text(
-              'Update Profile',
-              style: TextStyle(color: Colors.black),
+            // Text(
+            //   'Bob Beans',
+            //   style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
+            // ),
+            Text(FirebaseAuth.instance.currentUser!.email.toString(), style: TextStyle(fontSize: 20)),
+            SizedBox(
+              height: 30,
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
-            style: ElevatedButton.styleFrom(primary: Colors.red),
-            child: Text(
-              'Sign out',
-              style: TextStyle(color: Colors.black),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text(
+                'Update Profile',
+                style: TextStyle(color: Colors.black),
+              ),
             ),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+              child: Text(
+                'Sign out',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
+
+}
 //Settings Page
 class SettingsPage extends StatefulWidget {
   @override
@@ -212,6 +194,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Color? _tempShadeColor;
   ColorSwatch? _mainColor = Colors.lightGreen;
   Color? _shadeColor = Colors.lightGreen[300];
+
+  void _showProfile(){
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()));
+  }
 
   void _openDialog(String title, Widget content) {
     showDialog(
@@ -269,6 +257,17 @@ class _SettingsPageState extends State<SettingsPage> {
           OutlinedButton(
             onPressed: _openColorPicker,
             child: const Text('Pick Theme'),
+          ),
+
+          SizedBox(
+            height: 20,
+          ),
+
+          OutlinedButton(
+              onPressed: () {
+                _showProfile();
+              },
+              child:  const Text('Profile'),
           )
         ],
       ),
@@ -395,7 +394,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  TextEditingController emailcontroller = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  TextEditingController usercontroller = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
 
   @override
@@ -403,96 +403,69 @@ class _LoginState extends State<Login> {
     return Scaffold(
         body: SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.all(50.0),
-        child: Center(
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              child: Text(
-                'Welcome to Grocer Guide',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: 'Inspiration',
-                    fontSize: 65,
-                    fontWeight: FontWeight.bold),
-              ),
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(30),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: emailcontroller,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.black,
-                  labelText: 'Email',
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextField(
-                controller: passwordcontroller,
-                obscureText: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.black,
-                  labelText: 'Password',
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => Home(username: username),
-                //   ),
-                // );
-              },
-              child: Text(
-                'Forgot Password?',
-                style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 20,
-                    fontFamily: 'Playball',
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-            Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Center(
-                    child: SizedBox(
-                  height: 50,
-                  width: 300,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        db.signIn(emailcontroller, passwordcontroller);
-                      },
-                      child: Text(
-                        'Sign in',
-                        style: TextStyle(fontFamily: 'Playball', fontSize: 24),
-                      )),
-                ))),
-            Padding(
-                padding: EdgeInsets.all(1),
-                child: Center(
-                  child: InkWell(
+      child: Form(
+        key: formKey,
+        child: Padding(
+          padding: EdgeInsets.all(50.0),
+          child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    child: Text(
+                      'Welcome to Grocer Guide',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontFamily: 'Inspiration',
+                          fontSize: 65,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.all(30),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      controller: usercontroller,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.black,
+                        labelText: 'Username',
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (user) => user != null && user == ''
+                          ? 'Enter username'
+                          : null,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      controller: passwordcontroller,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        fillColor: Colors.black,
+                        labelText: 'Password',
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (password) => password != null && password == ''
+                          ? 'Enter password'
+                          : null,
+                    ),
+                  ),
+                  InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Register(),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => Home(username: username),
+                      //   ),
+                      // );
                     },
                     child: Text(
-                      'Click to create an account!',
-                      textAlign: TextAlign.center,
+                      'Forgot Password?',
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: 20,
@@ -500,10 +473,51 @@ class _LoginState extends State<Login> {
                           fontWeight: FontWeight.w500),
                     ),
                   ),
-                )),
-          ],
-        )),
-      ),
+                  Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Center(
+                          child: SizedBox(
+                            height: 50,
+                            width: 300,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  final isValid = formKey.currentState!.validate();
+                                  if (isValid){
+                                    db.signIn(usercontroller, passwordcontroller, context);
+                                  }
+                                },
+                                child: Text(
+                                  'Sign in',
+                                  style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                                )),
+                          ))),
+                  Padding(
+                      padding: EdgeInsets.all(1),
+                      child: Center(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Register(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Click to create an account!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 20,
+                                fontFamily: 'Playball',
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      )),
+                ],
+              )),
+        ),
+      )
     ));
 
   }
@@ -629,7 +643,7 @@ class _RegisterState extends State<Register> {
                                 onPressed: () {
                                   final isValid = formKey.currentState!.validate();
                                   if (isValid){
-
+                                    db.signUp(usernamecontroller, emailcontroller, passwordcontroller);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -674,3 +688,5 @@ class _RegisterState extends State<Register> {
     ));
   }
 }
+
+
