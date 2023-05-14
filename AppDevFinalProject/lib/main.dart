@@ -8,7 +8,7 @@ import 'Model.dart';
 import 'dbhelper.dart';
 import './settings.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
-var db = new DatabaseHelper();
+import 'globals.dart' as globals;
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,14 +16,22 @@ void main() async{
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Project',
       debugShowCheckedModeBanner: false,
+      color: globals.mainColor,
       theme: ThemeData(
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.green
         //fontFamily: 'Inspiration'
       ),
       home: StreamBuilder<User?>(
@@ -32,14 +40,17 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData){
             return MyHomePage();
           } else{
+            print('hello');
             Navigator.of(context).pop;
             return Login();
           }
         },
       ),
-    );
+    );;
   }
 }
+
+
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -64,6 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        backgroundColor: globals.mainColor,
+
         title: Text('Grocelery', style: TextStyle(
             fontFamily: 'Inspiration',
             fontSize: 35,
@@ -72,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: NavigationDrawer(),
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.green,
+        backgroundColor: globals.mainColor,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
         items: [
@@ -133,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Profile page"),
-        backgroundColor: Colors.green,
+        backgroundColor: globals.mainColor,
       ),
       body:       Center(
         child: Column(
@@ -159,6 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             ElevatedButton(
               onPressed: () {},
+
               child: Text(
                 'Update Profile',
                 style: TextStyle(color: Colors.black),
@@ -190,15 +204,16 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  ColorSwatch? _tempMainColor;
-  Color? _tempShadeColor;
-  ColorSwatch? _mainColor = Colors.lightGreen;
-  Color? _shadeColor = Colors.lightGreen[300];
+  var _tempMainColor;
+  var _tempShadeColor;
+  var _mainColor = Colors.lightGreen;
+  var _shadeColor = Colors.lightGreen[300];
 
   void _showProfile(){
     Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()));
+        MaterialPageRoute(builder: (context) => ProfilePage()));
+
   }
 
   void _openDialog(String title, Widget content) {
@@ -221,6 +236,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() => _mainColor = _tempMainColor);
                 setState(() => _shadeColor = _tempShadeColor);
                 print('Main Color: $_mainColor\nShade Color: $_shadeColor');
+                globals.mainColor =  _shadeColor!;
+                setState(() {});
               },
             ),
           ],
@@ -282,7 +299,7 @@ class NavigationDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.green,
+      backgroundColor: globals.mainColor,
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -296,7 +313,7 @@ class NavigationDrawer extends StatelessWidget {
   }
 
   Widget buildHeader(BuildContext context) => Material(
-        color: Colors.green,
+        color: globals.mainColor,
         child: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -323,7 +340,7 @@ class NavigationDrawer extends StatelessWidget {
       );
 
   Widget buildMenuItems(BuildContext context) => Container(
-        color: Colors.green,
+        color: globals.mainColor,
         padding: EdgeInsets.all(1),
         child: Wrap(
           children: [
@@ -480,10 +497,20 @@ class _LoginState extends State<Login> {
                             height: 50,
                             width: 300,
                             child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async{
                                   final isValid = formKey.currentState!.validate();
                                   if (isValid){
-                                    db.signIn(usercontroller, passwordcontroller, context);
+
+                                    var isGood = await globals.db.signIn(usercontroller, passwordcontroller, context);
+                                    if (isGood){
+                                    }
+                                    else{
+                                      usercontroller.text = "";
+                                      passwordcontroller.text = "";
+                                      final snackBar = SnackBar(content: Text("either the email or password is incorrect"), backgroundColor: Colors.red,);
+
+                                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                    }
                                   }
                                 },
                                 child: Text(
@@ -524,10 +551,10 @@ class _LoginState extends State<Login> {
 
   // void checkPassword(TextEditingController id, TextEditingController password) async{
   //   final db = new DatabaseHelper();
-  //   var user = await db.firestore.collection('users').doc(id.text).get();
+  //   var user = await globals.db.firestore.collection('users').doc(id.text).get();
   //
   //   if (user.exists) {
-  //     String data = db.readUser(id.text).toString();
+  //     String data = globals.db.readUser(id.text).toString();
   //     Map<String, dynamic> valueMap = json.decode(data);
   //     User user = new User.fromJson(valueMap);
   //     var pass = user.password;
@@ -640,16 +667,23 @@ class _RegisterState extends State<Register> {
                             height: 50,
                             width: 300,
                             child: ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async{
                                   final isValid = formKey.currentState!.validate();
                                   if (isValid){
-                                    db.signUp(usernamecontroller, emailcontroller, passwordcontroller);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Login(),
-                                      ),
-                                    );
+                                    var isGood = await globals.db.signUp(usernamecontroller, emailcontroller, passwordcontroller, context);
+                                    if (isGood){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Login(),
+                                        ),
+                                      );
+                                    }
+                                    else{
+                                      usernamecontroller.text = "";
+                                      emailcontroller.text = "";
+                                      passwordcontroller.text = "";
+                                    }
                                   }
                                 },
                                 child: Text(

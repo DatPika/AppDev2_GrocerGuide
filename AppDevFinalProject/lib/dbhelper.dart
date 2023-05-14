@@ -9,7 +9,7 @@ class DatabaseHelper{
   final firestore = FirebaseFirestore.instance;
   DatabaseHelper();
 
-  Future signIn(TextEditingController id, TextEditingController password, context) async{
+  Future<bool> signIn(TextEditingController id, TextEditingController password, BuildContext context) async{
     try {
       var usertype = await firestore.collection('users').doc(id.text.trim()).get();
       if (usertype.exists){
@@ -19,7 +19,7 @@ class DatabaseHelper{
             email: a.email,
             password: password.text.trim()
         );
-
+        return true;
       }
     } on FirebaseAuthException catch (e){
       // var u = new Utils();
@@ -29,9 +29,10 @@ class DatabaseHelper{
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     }
+    return false;
   }
 
-  Future signUp(TextEditingController id, TextEditingController email, TextEditingController password) async{
+  Future<bool> signUp(TextEditingController id, TextEditingController email, TextEditingController password, BuildContext context) async{
     try {
       var usertype = await firestore.collection('users').doc(id.text.trim()).get();
       if (!usertype.exists){
@@ -40,11 +41,14 @@ class DatabaseHelper{
             password: password.text.trim()
         );
         createUser(UserA(username: id.text.trim(), email: email.text.trim(), password: password.text.trim()));
-
+        return true;
       }
     } on FirebaseAuthException catch (e){
-      print(e);
+      final snackBar = SnackBar(content: Text(e.message.toString()), backgroundColor: Colors.red,);
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+    return false;
   }
 
   createUser(UserA user) async{
