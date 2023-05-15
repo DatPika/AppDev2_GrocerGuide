@@ -4,3 +4,4 @@ import 'dbhelper.dart';
 
 Color mainColor = Colors.green;
 DatabaseHelper db = new DatabaseHelper();
+String fontFamily = 'Inter';

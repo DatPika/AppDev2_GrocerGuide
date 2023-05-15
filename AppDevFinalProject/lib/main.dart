@@ -26,6 +26,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,8 +34,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       color: globals.mainColor,
       theme: ThemeData(
-        primarySwatch: Colors.green
-        //fontFamily: 'Inspiration'
+        primarySwatch: Colors.green,
+        shadowColor: Colors.lightGreen
       ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -42,7 +43,7 @@ class _MyAppState extends State<MyApp> {
           if (snapshot.hasData){
             return MyHomePage();
           } else{
-            print('hello');
+            print('There\'s been an error in in loading of the data');
             Navigator.of(context).pop;
             return Login();
           }
@@ -85,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: globals.mainColor,
 
         title: Text('Grocelery', style: TextStyle(
-            fontFamily: 'Inspiration',
+            fontFamily: globals.fontFamily,
             fontSize: 35,
             fontWeight: FontWeight.bold),),
       ),
@@ -205,10 +206,6 @@ class _ProfilePageState extends State<ProfilePage> {
               BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
               alignment: Alignment.center,
             ),
-            // Text(
-            //   'Bob Beans',
-            //   style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold, fontFamily: 'Playball',),
-            // ),
             Text(FirebaseAuth.instance.currentUser!.email.toString(), style: TextStyle(fontSize: 20)),
             SizedBox(
               height: 30,
@@ -581,7 +578,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() => _mainColor = _tempMainColor);
                 setState(() => _shadeColor = _tempShadeColor);
                 print('Main Color: $_mainColor\nShade Color: $_shadeColor');
-                globals.mainColor =  _shadeColor!;
+                globals.mainColor =  _mainColor!;
                 setState(() {});
               },
             ),
@@ -670,7 +667,7 @@ class _LoginState extends State<Login> {
                       'Welcome to Grocer Guide',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontFamily: 'Inspiration',
+                          fontFamily: globals.fontFamily,
                           fontSize: 65,
                           fontWeight: FontWeight.bold),
                     ),
@@ -722,7 +719,7 @@ class _LoginState extends State<Login> {
                       style: TextStyle(
                           color: Colors.black54,
                           fontSize: 20,
-                          fontFamily: 'Playball',
+                          fontFamily: globals.fontFamily,
                           fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -754,7 +751,7 @@ class _LoginState extends State<Login> {
                                 },
                                 child: Text(
                                   'Sign in',
-                                  style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                                  style: TextStyle(fontFamily: globals.fontFamily, fontSize: 24),
                                 )),
                           ))),
                   Padding(
@@ -777,7 +774,7 @@ class _LoginState extends State<Login> {
                             style: TextStyle(
                                 color: Colors.black54,
                                 fontSize: 20,
-                                fontFamily: 'Playball',
+                                fontFamily: globals.fontFamily,
                                 fontWeight: FontWeight.w500),
                           ),
                         ),
@@ -848,7 +845,7 @@ class _RegisterState extends State<Register> {
                       'Join to Grocelery',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontFamily: 'Inspiration',
+                          fontFamily: globals.fontFamily,
                           fontSize: 75,
                           fontWeight: FontWeight.bold),
                     ),
@@ -926,7 +923,7 @@ class _RegisterState extends State<Register> {
                                 },
                                 child: Text(
                                   'Register',
-                                  style: TextStyle(fontFamily: 'Playball', fontSize: 24),
+                                  style: TextStyle(fontFamily: globals.fontFamily, fontSize: 24),
                                 )),
                           ))),
                   Padding(
@@ -944,7 +941,7 @@ class _RegisterState extends State<Register> {
                             style: TextStyle(
                                 color: Colors.black54,
                                 fontSize: 20,
-                                fontFamily: 'Playball',
+                                fontFamily: globals.fontFamily,
                                 fontWeight: FontWeight.w500),
                           ),
                         ),
