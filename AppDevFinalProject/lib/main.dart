@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     HomePage(),
+    ItemsPage(),
+    ListsPage(),
+    RecipiesPage(),
+    StoresListsPage(),
+    CartList(),
     SettingsPage(),
   ];
 
@@ -75,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: globals.mainColor,
+        backgroundColor: Colors.green,
 
         title: Text('Grocelery', style: TextStyle(
             fontFamily: 'Inspiration',
@@ -92,28 +99,65 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home_outlined,
-                color: Colors.white,
+                color: Colors.grey,
                 size: 30,
               ),
-              activeIcon: Icon(Icons.home, color: Colors.white, size: 35),
+              activeIcon: Icon(Icons.home, color: globals.mainColor, size: 35),
               label: 'Home'),
-          // BottomNavigationBarItem(
-          //   icon: Icon(
-          //     Icons.person_outline,
-          //     color: Colors.white,
-          //     size: 30,
-          //   ),
-          //   label: 'Profile',
-          //   activeIcon: Icon(Icons.person, color: Colors.white, size: 35),
-          // ),
+
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.emoji_food_beverage,
+                color: Colors.grey,
+                size: 30,
+              ),
+              activeIcon: Icon(Icons.emoji_food_beverage_outlined, color: globals.mainColor, size: 35),
+              label: 'Items'),
+
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.list,
+                color: Colors.grey,
+                size: 30,
+              ),
+              activeIcon: Icon(Icons.list_alt_outlined, color: globals.mainColor, size: 35),
+              label: 'Lists'),
+
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.dinner_dining,
+                color: Colors.grey,
+                size: 30,
+              ),
+              activeIcon: Icon(Icons.dinner_dining_outlined, color: globals.mainColor, size: 35),
+              label: 'Recipies'),
+
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.store,
+                color: Colors.grey,
+                size: 30,
+              ),
+              activeIcon: Icon(Icons.store_outlined, color: globals.mainColor, size: 35),
+              label: 'Stores'),
+
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Colors.grey,
+                size: 30,
+              ),
+              activeIcon: Icon(Icons.shopping_cart_outlined, color: globals.mainColor, size: 35),
+              label: 'My Cart'),
+
           BottomNavigationBarItem(
             icon: Icon(
               Icons.settings_outlined,
-              color: Colors.white,
+              color: Colors.grey,
               size: 30,
             ),
             label: 'Settings',
-            activeIcon: Icon(Icons.settings, color: Colors.white, size: 35),
+            activeIcon: Icon(Icons.settings, color: globals.mainColor, size: 35),
           )
         ],
       ),
@@ -194,9 +238,223 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-
 }
+
+class ItemsPage extends StatefulWidget {
+  const ItemsPage({Key? key}) : super(key: key);
+
+  @override
+  State<ItemsPage> createState() => _ItemsPageState();
+}
+
+class _ItemsPageState extends State<ItemsPage> {
+  CollectionReference itemColloction = globals.db.firestore.collection('itmes');
+  late Stream<QuerySnapshot> itemStream;
+
+  Future<List<Item>> getAllItem() async {
+    return await globals.db.allItem();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    itemStream = itemColloction.snapshots();
+  }
+  @override
+  Widget build(BuildContext context) {
+    itemColloction.get();
+    itemColloction.snapshots();
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: FutureBuilder<List<Item>>(
+                future: getAllItem(),
+                builder: (context, snapshot){
+                  if(snapshot.connectionState == ConnectionState.done){
+                    if (snapshot.hasData){
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (c, index) {
+                          return Column(
+                            children: [
+                              ListTile(
+                                iconColor: globals.mainColor,
+                                tileColor: globals.mainColor.withOpacity(0.1),
+                                title: Text("Name: ${snapshot.data![index].itemName}"),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(snapshot.data![index].itemType),
+                                    Text(snapshot.data![index].itemCost.toString()),
+                                  ],
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          print(snapshot.data![index].itemCost);
+                                        },
+                                        icon: Icon(Icons.edit)
+                                    ),
+
+                                    IconButton(
+                                        onPressed: () {
+                                          globals.db.deleteItem(snapshot.data![index].itemName);
+                                          Navigator.pop(context);  // pop current page
+                                          Navigator.pushNamed(context, "MyHomePage");
+                                        },
+                                        icon: Icon(Icons.delete)
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  }
+                  return Center(child: CircularProgressIndicator());
+                },
+              )
+            ),
+
+            ElevatedButton(
+              style: ButtonStyle(),
+                onPressed: () async{
+                  TextEditingController name = TextEditingController();
+                  TextEditingController type = TextEditingController();
+                  TextEditingController cost = TextEditingController();
+
+                  showDialog(context: context, builder: (BuildContext context) => new AlertDialog(
+                    title: Text("Add new Item"),
+                    content: Container(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            child: TextField(
+                              controller: name,
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(),
+                                labelText: 'Item Name'
+                              ),
+
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            child: TextField(
+                              controller: type,
+                              decoration: InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  labelText: 'Item Type'
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            child: TextField(
+                              controller: cost,
+                              decoration: InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  labelText: 'Item Cost'
+                              ),
+
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      ElevatedButton(
+                          onPressed: () {
+                            if (double.parse(cost.text) > 0){
+                              globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
+                            }
+                            else{
+                              globals.db.createItem(Item(itemName: name.text, itemType: type.text));
+                            }
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Add')
+                      )
+                    ],
+                  )
+                  );
+                },
+                child: Text(
+                  'Add Item',
+                  style: TextStyle(fontSize: 24, color: Colors.white),
+                )),
+          ],
+        )
+      ),
+    );
+  }
+}
+
+class ListsPage extends StatefulWidget {
+  const ListsPage({Key? key}) : super(key: key);
+
+  @override
+  State<ListsPage> createState() => _ListsPageState();
+}
+
+class _ListsPageState extends State<ListsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+class RecipiesPage extends StatefulWidget {
+  const RecipiesPage({Key? key}) : super(key: key);
+
+  @override
+  State<RecipiesPage> createState() => _RecipiesPageState();
+}
+
+class _RecipiesPageState extends State<RecipiesPage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+class StoresListsPage extends StatefulWidget {
+  const StoresListsPage({Key? key}) : super(key: key);
+
+  @override
+  State<StoresListsPage> createState() => _StoresListsPageState();
+}
+
+class _StoresListsPageState extends State<StoresListsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+class CartList extends StatefulWidget {
+  const CartList({Key? key}) : super(key: key);
+
+  @override
+  State<CartList> createState() => _CartListState();
+}
+
+class _CartListState extends State<CartList> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+
 //Settings Page
 class SettingsPage extends StatefulWidget {
   @override
@@ -503,6 +761,9 @@ class _LoginState extends State<Login> {
 
                                     var isGood = await globals.db.signIn(usercontroller, passwordcontroller, context);
                                     if (isGood){
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(builder: (context) => MyHomePage()),
+                                      );
                                     }
                                     else{
                                       usercontroller.text = "";
@@ -523,6 +784,8 @@ class _LoginState extends State<Login> {
                       child: Center(
                         child: InkWell(
                           onTap: () {
+                            Navigator.of(context).pop;
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -672,11 +935,8 @@ class _RegisterState extends State<Register> {
                                   if (isValid){
                                     var isGood = await globals.db.signUp(usernamecontroller, emailcontroller, passwordcontroller, context);
                                     if (isGood){
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Login(),
-                                        ),
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(builder: (context) => Login()),
                                       );
                                     }
                                     else{
@@ -696,11 +956,8 @@ class _RegisterState extends State<Register> {
                       child: Center(
                         child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Login(),
-                              ),
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) => Login()),
                             );
                           },
                           child: Text(

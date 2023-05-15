@@ -104,6 +104,12 @@ class DatabaseHelper{
     }
   }
 
+  Future<List<Item>> allItem() async {
+    final snapshot = await firestore.collection('items').get();
+    final itemData = snapshot.docs.map((e) => Item.fromSnapshot(e)).toList();
+    return itemData;
+  }
+
   createItem(Item item) async{
     try {
       if (firestore.collection('items').doc(item.itemName).get().toString() != item.itemName){
@@ -120,6 +126,23 @@ class DatabaseHelper{
       print(e);
     }
   }
+
+  Future<int> itemsLength() async{
+    return await firestore.collection('items').snapshots().length;
+  }
+
+  Future<int> listsLength() async{
+    return await firestore.collection('itemsList').snapshots().length;
+  }
+
+  Future<int> recipiesLength() async{
+    return await firestore.collection('recipiesList').snapshots().length;
+  }
+
+  Future<int> storesLength() async{
+    return await firestore.collection('storesList').snapshots().length;
+  }
+
 
   readItem(String itemName) async {
     DocumentSnapshot documentSnapshot;

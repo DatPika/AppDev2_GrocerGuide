@@ -35,6 +35,11 @@ class Item{
     'itemType' : itemType,
     'itemCost' : itemCost
   };
+
+  factory Item.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data();
+    return Item(itemName: data!["itemName"], itemType: data!["itemType"]);
+  }
 }
 
 class ItemsList{
