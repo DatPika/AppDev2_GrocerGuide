@@ -110,6 +110,18 @@ class DatabaseHelper{
     return itemData;
   }
 
+  Future<List<ItemsList>> allItemsList() async {
+    final snapshot = await firestore.collection('itemsList').get();
+    final itemData = snapshot.docs.map((e) => ItemsList.fromSnapshot(e)).toList();
+    return itemData;
+  }
+
+  Future<Item> allItemFromList(DocumentSnapshot<Map<String, dynamic>> document) async {
+    final itemData = Item.fromSnapshot(document);
+    return itemData;
+  }
+
+
   createItem(Item item) async{
     try {
       if (firestore.collection('items').doc(item.itemName).get().toString() != item.itemName){

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'globals.dart' as globals;
 
 int getIntOrDefault(dynamic value) {
   return value is int ? value : 0;
@@ -26,9 +27,10 @@ List<Item> getItemList(dynamic value){
 class Item{
   final String itemName;
   final String itemType;
-  double? itemCost = 0;
+  double itemCost;
 
-  Item({required this.itemName,required this.itemType, this.itemCost});
+  Item({required this.itemName,required this.itemType, this.itemCost = 0});
+
 
   Map<String, dynamic> toJson() => {
     'itemName' : itemName,
@@ -38,7 +40,7 @@ class Item{
 
   factory Item.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
     final data = document.data();
-    return Item(itemName: data!["itemName"], itemType: data!["itemType"]);
+    return Item(itemName: data!["itemName"], itemType: data!["itemType"], itemCost: data!['itemCost']);
   }
 }
 
@@ -55,7 +57,7 @@ class ItemsList{
       }
     });
   }
-  ItemsList({required this.type, required this.itemListTitle,required this.itemList}){
+  ItemsList({required this.type, required this.itemListTitle,required this.itemList, this.totalCost = 0}){
     _calculateTotalcost();
   }
 
@@ -67,13 +69,18 @@ class ItemsList{
     'totalCost' : totalCost
   };
 
-  factory ItemsList.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+
+
+  factory ItemsList.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+
+    final data = document.data();
+    print(data);
 
     return ItemsList(
-      itemListTitle: getStringOrDefault(data["itemListTitle"]),
-      type: getStringOrDefault(data["type"]),
-      itemList: getItemList(data["itemList"]),
+        itemListTitle: data!['itemListTitle'],
+        type: data!['type'],
+        itemList: data!['itemList'],
+        totalCost: data!['totalCost']
     );
   }
 }

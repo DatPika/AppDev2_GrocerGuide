@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -82,14 +82,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Colors.green,
+        backgroundColor: globals.mainColor,
 
         title: Text('Grocelery', style: TextStyle(
             fontFamily: 'Inspiration',
             fontSize: 35,
             fontWeight: FontWeight.bold),),
       ),
-      drawer: NavigationDrawer(),
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: globals.mainColor,
@@ -406,9 +405,97 @@ class ListsPage extends StatefulWidget {
 }
 
 class _ListsPageState extends State<ListsPage> {
+  CollectionReference itemColloction = globals.db.firestore.collection('itemsList');
+  late Stream<QuerySnapshot> itemStream;
+
+  Future<List<ItemsList>> getAllItemsList() async {
+    return await globals.db.allItemsList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    itemStream = itemColloction.snapshots();
+  }
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    itemColloction.get();
+    itemColloction.snapshots();
+    return Scaffold(
+      body: Center(
+          child: Column(
+            children: [
+              Expanded(
+                  child: FutureBuilder<List<ItemsList>>(
+                    future: getAllItemsList(),
+                    builder: (context, snapshot){
+                      if(snapshot.connectionState == ConnectionState.done){
+                        print(getAllItemsList());
+                        if (snapshot.hasData){
+                          print(getAllItemsList());
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (c, index) {
+                              print(snapshot.data![index].itemListTitle);
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    iconColor: globals.mainColor,
+                                    tileColor: globals.mainColor.withOpacity(0.1),
+                                    title: Text("Name: ${snapshot.data![index].itemListTitle}"),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(snapshot.data![index].type),
+                                        Text(snapshot.data![index].totalCost.toString()),
+                                      ],
+                                    ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                            },
+                                            icon: Icon(Icons.edit)
+                                        ),
+
+                                        IconButton(
+                                            onPressed: () {
+                                              globals.db.deleteItemsList(snapshot.data![index].itemListTitle);
+                                              Navigator.pop(context);  // pop current page
+                                              Navigator.pushNamed(context, "MyHomePage");
+                                            },
+                                            icon: Icon(Icons.delete)
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      }
+
+                      return Center(child: CircularProgressIndicator(color: globals.mainColor,));
+                    },
+                  )
+              ),
+
+              ElevatedButton(
+                  style: ButtonStyle(),
+                  onPressed: (){
+                    
+                  },
+                  child: Text(
+                    'Add List',
+                    style: TextStyle(fontSize: 24, color: Colors.white),
+                  )),
+            ],
+          )
+      ),
+    );
   }
 }
 
@@ -531,7 +618,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           OutlinedButton(
             onPressed: _openColorPicker,
-            child: const Text('Pick Theme'),
+            child: Text('Pick Theme', style: TextStyle(color: globals.mainColor)),
           ),
 
           SizedBox(
@@ -542,7 +629,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 _showProfile();
               },
-              child:  const Text('Profile'),
+              child: Text('Profile', style: TextStyle(color: globals.mainColor)),
           )
         ],
       ),
@@ -551,115 +638,6 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 // Navigation Bar
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: globals.mainColor,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            buildHeader(context),
-            buildMenuItems(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildHeader(BuildContext context) => Material(
-        color: globals.mainColor,
-        child: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => MyHomePage()));
-          },
-          child: Container(
-            padding: EdgeInsets.only(
-                top: 24 + MediaQuery.of(context).padding.top, bottom: 24),
-            child: Column(
-              children: [
-                Text(
-                  'Grocelery',
-                  style: TextStyle(
-                      fontFamily: 'Inspiration',
-                      fontSize: 75,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-  Widget buildMenuItems(BuildContext context) => Container(
-        color: globals.mainColor,
-        padding: EdgeInsets.all(1),
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: Icon(
-                Icons.location_on,
-                color: Colors.white,
-              ),
-              onTap: () {},
-              title: Text('Locations',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Playball',
-                      fontSize: 30)),
-              trailing: Icon(
-                Icons.arrow_right_outlined,
-                size: 30,
-                color: Colors.white,
-              ),
-            ),
-            Divider(
-              color: Colors.black,
-              thickness: 1,
-            ),
-            ListTile(
-              leading: Icon(Icons.fastfood, color: Colors.white),
-              onTap: () {},
-              title: Text(
-                'Ingredients',
-                style: TextStyle(
-                    color: Colors.white, fontFamily: 'Playball', fontSize: 30),
-              ),
-              trailing: Icon(Icons.arrow_right_outlined,
-                  size: 30, color: Colors.white),
-            ),
-            Divider(
-              color: Colors.black,
-              thickness: 1,
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.receipt_long,
-                color: Colors.white,
-              ),
-              onTap: () {},
-              title: Text('Recipes',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Playball',
-                      fontSize: 30)),
-              trailing: Icon(Icons.arrow_right_outlined,
-                  size: 30, color: Colors.white),
-            ),
-            Divider(
-              color: Colors.black,
-              thickness: 1,
-            ),
-          ],
-        ),
-      );
-}
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
