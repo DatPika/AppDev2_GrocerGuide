@@ -1,43 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
+import './globals.dart' as globals;
+import './main.dart';
+import './profile.dart';
 
 void main() {
-  runApp(SettingsSetup());
+  runApp(SettingsPage());
 }
 
-class SettingsSetup extends StatelessWidget {
-  const SettingsSetup({Key? key}) : super(key: key);
-
+//Settings Page
+class SettingsPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.lightGreen),
-    // theme: ThemeData(
-    //   colorScheme: ColorScheme.fromSwatch().copyWith(
-    //     primary: _mainColor,
-    //     secondary: _shadeColor,
-    //   ),
-    // ),
-    title: 'Settings Page',
-    home: Settings()
-    );
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  var _tempMainColor;
+  var _tempShadeColor;
+  var _mainColor = Colors.lightGreen;
+  var _shadeColor = Colors.lightGreen[300];
+
+  void _showProfile(){
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfilePage()));
+
   }
-}
-
-
-class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
-
-  @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  ColorSwatch? _tempMainColor;
-  Color? _tempShadeColor;
-  ColorSwatch? _mainColor = Colors.lightGreen;
-  Color? _shadeColor = Colors.lightGreen[300];
 
   void _openDialog(String title, Widget content) {
     showDialog(
@@ -59,6 +47,8 @@ class _SettingsState extends State<Settings> {
                 setState(() => _mainColor = _tempMainColor);
                 setState(() => _shadeColor = _tempShadeColor);
                 print('Main Color: $_mainColor\nShade Color: $_shadeColor');
+                globals.mainColor =  _mainColor!;
+                setState(() {});
               },
             ),
           ],
@@ -79,41 +69,36 @@ class _SettingsState extends State<Settings> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.lightGreen),
-        // theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSwatch().copyWith(
-        //     primary: _mainColor,
-        //     secondary: _shadeColor,
-        //   ),
-        // ),
-        title: 'Settings Page',
-        home: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text('Settings'),
+    return Center(
+      child: Column(
+        children: <Widget>[
+          //Picking a color theme
+          Container(
+              margin: EdgeInsets.only(top: 50),
+              child: Text(
+                  'Pick your color theme'
+              )
           ),
-          body: Center(
-            child: Column(
-              children: <Widget>[
-                //Picking a color theme
-                Container(
-                    margin: EdgeInsets.only(top: 50),
-                    child: Text(
-                        'Pick your color theme'
-                    )
-                ),
-                OutlinedButton(
-                  onPressed: _openColorPicker,
-                  child: const Text('Pick Theme'),
-                )
-              ],
-            ),
+          OutlinedButton(
+            onPressed: _openColorPicker,
+            child: Text('Pick Theme', style: TextStyle(color: globals.mainColor)),
           ),
-        )
+
+          SizedBox(
+            height: 20,
+          ),
+
+          OutlinedButton(
+            onPressed: () {
+              _showProfile();
+            },
+            child: Text('Profile', style: TextStyle(color: globals.mainColor)),
+          )
+        ],
+      ),
     );
   }
 }
