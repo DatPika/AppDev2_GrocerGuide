@@ -11,7 +11,7 @@ class ItemsPage extends StatefulWidget {
 }
 
 class _ItemsPageState extends State<ItemsPage> {
-  CollectionReference itemColloction = globals.db.firestore.collection('itmes');
+  CollectionReference itemColloction = globals.db.firestore.collection('items');
   late Stream<QuerySnapshot> itemStream;
 
   Future<List<Item>> getAllItem() async {

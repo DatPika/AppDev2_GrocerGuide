@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         backgroundColor: globals.mainColor,
 
-        title: Text('Grocelery', style: TextStyle(
+        title: Text('Grocer Guide', style: TextStyle(
             fontFamily: globals.fontFamily,
             fontSize: 35,
             fontWeight: FontWeight.bold),),
@@ -374,7 +374,7 @@ class _RegisterState extends State<Register> {
                 children: [
                   Container(
                     child: Text(
-                      'Join to Grocelery',
+                      'Join Grocer Guide',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontFamily: globals.fontFamily,
