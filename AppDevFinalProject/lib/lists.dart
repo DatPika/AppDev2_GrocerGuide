@@ -11,7 +11,7 @@ class ListsPage extends StatefulWidget {
 }
 
 class _ListsPageState extends State<ListsPage> {
-  CollectionReference itemColloction = globals.db.firestore.collection('itemsList');
+  CollectionReference itemCollection = globals.db.firestore.collection('itemsList');
   late Stream<QuerySnapshot> itemStream;
 
   Future<List<ItemsList>> getAllItemsList() async {
@@ -21,12 +21,12 @@ class _ListsPageState extends State<ListsPage> {
   @override
   void initState() {
     super.initState();
-    itemStream = itemColloction.snapshots();
+    itemStream = itemCollection.snapshots();
   }
   @override
   Widget build(BuildContext context) {
-    itemColloction.get();
-    itemColloction.snapshots();
+    itemCollection.get();
+    itemCollection.snapshots();
     return Scaffold(
       body: Center(
           child: Column(
@@ -36,14 +36,15 @@ class _ListsPageState extends State<ListsPage> {
                     future: getAllItemsList(),
                     builder: (context, snapshot){
                       if(snapshot.connectionState == ConnectionState.done){
-                        print(getAllItemsList());
+                        // print(getAllItemsList());
+                        print(snapshot);
                         if (snapshot.hasData){
-                          print(getAllItemsList());
+                          // print(getAllItemsList());
                           return ListView.builder(
                             shrinkWrap: true,
                             itemCount: snapshot.data!.length,
                             itemBuilder: (c, index) {
-                              print(snapshot.data![index].itemListTitle);
+                              // print(snapshot.data![index].itemListTitle);
                               return Column(
                                 children: [
                                   ListTile(
@@ -84,7 +85,7 @@ class _ListsPageState extends State<ListsPage> {
                         }
                       }
 
-                      return Center(child: CircularProgressIndicator(color: globals.mainColor,));
+                      return Center(child: CircularProgressIndicator(color: globals.mainColor));
                     },
                   )
               ),

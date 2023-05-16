@@ -11,7 +11,7 @@ class ItemsPage extends StatefulWidget {
 }
 
 class _ItemsPageState extends State<ItemsPage> {
-  CollectionReference itemColloction = globals.db.firestore.collection('items');
+  CollectionReference itemCollection = globals.db.firestore.collection('items');
   late Stream<QuerySnapshot> itemStream;
 
   Future<List<Item>> getAllItem() async {
@@ -21,12 +21,12 @@ class _ItemsPageState extends State<ItemsPage> {
   @override
   void initState() {
     super.initState();
-    itemStream = itemColloction.snapshots();
+    itemStream = itemCollection.snapshots();
   }
   @override
   Widget build(BuildContext context) {
-    itemColloction.get();
-    itemColloction.snapshots();
+    itemCollection.get();
+    itemCollection.snapshots();
     return Scaffold(
       body: Center(
           child: Column(
@@ -81,7 +81,7 @@ class _ItemsPageState extends State<ItemsPage> {
                           );
                         }
                       }
-                      return Center(child: CircularProgressIndicator());
+                      return Center(child: CircularProgressIndicator(color: globals.mainColor));
                     },
                   )
               ),
