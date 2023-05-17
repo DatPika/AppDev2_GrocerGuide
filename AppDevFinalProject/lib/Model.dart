@@ -43,43 +43,53 @@ class Item{
   }
 }
 
-class ItemsList{
+class ItemsList {
   final String type;
   final String itemListTitle;
   final List<Item> itemList;
-  double totalCost = 0;
+  double totalCost;
 
-  _calculateTotalcost(){
+  ItemsList({
+    required this.type,
+    required this.itemListTitle,
+    required this.itemList,
+    this.totalCost = 0,
+  }) {
+    _calculateTotalCost();
+  }
+
+  void _calculateTotalCost() {
+    totalCost = 0;
     itemList.forEach((e) {
-      if(e.itemCost != null){
+      if (e.itemCost != null) {
         totalCost += double.parse(e.itemCost.toString());
       }
     });
   }
-  ItemsList({required this.type, required this.itemListTitle,required this.itemList, this.totalCost = 0}){
-    _calculateTotalcost();
-  }
 
   Map<String, dynamic> toJson() => {
-
-    'type' : type,
-    'itemListTitle' : itemListTitle,
-    'itemList' : itemList.map((e) => e.toJson()).toList(),
-    'totalCost' : totalCost
+    'type': type,
+    'itemListTitle': itemListTitle,
+    'itemList': itemList.map((e) => e.toJson()).toList(),
+    'totalCost': totalCost,
   };
 
-
-
   factory ItemsList.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-
-    final data = document.data();
+    final data = document.data()!;
     print(data);
+    final itemList = (data['itemList'] as List<dynamic>)
+        .map((item) => Item(
+      itemName: item['itemName'],
+      itemType: item['itemType'],
+      itemCost: item['itemCost']?.toDouble(),
+    ))
+        .toList();
 
     return ItemsList(
-        itemListTitle: data!['itemListTitle'],
-        type: data!['type'],
-        itemList: data!['itemList'],
-        totalCost: data!['totalCost']
+      itemListTitle: data['itemListTitle'],
+      type: data['type'],
+      itemList: itemList,
+      totalCost: data['totalCost']?.toDouble(),
     );
   }
 }
