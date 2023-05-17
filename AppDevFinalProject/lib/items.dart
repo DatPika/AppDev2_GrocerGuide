@@ -127,7 +127,7 @@ class _ItemsPageState extends State<ItemsPage> {
                                     border: UnderlineInputBorder(),
                                     labelText: 'Item Cost'
                                 ),
-
+                                  keyboardType: TextInputType.number
                               ),
                             ),
                           ],
