@@ -293,6 +293,43 @@ class DatabaseHelper{
     }
   }
 
+  Future<List<Item>> allItems() async {
+    try {
+      final QuerySnapshot snapshot = await firestore.collection('items').get();
+      final List<Item> items = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final itemName = data['itemName'] as String?;
+        final itemType = data['itemType'] as String?;
+        final itemCost = data['itemCost'] as double?;
+        // ... add more properties as needed ...
+        return Item(
+          itemName: itemName ?? '',
+          itemType: itemType ?? '',
+          itemCost: itemCost ?? 0.0,
+          // ... add more properties as needed ...
+        );
+      }).toList();
+      return items;
+    } catch (e) {
+      print('Error fetching items: $e');
+      return [];
+    }
+  }
+
+
+
+// Add this method to the DatabaseHelper class
+  insertItemsList(ItemsList itemsList) async {
+    try {
+      await firestore.collection('itemsList').doc(itemsList.itemListTitle).set(
+        itemsList.toJson(),
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
 }
 // class Utils {
 //   final messengerKey = GlobalKey<ScaffoldMessengerState>();
