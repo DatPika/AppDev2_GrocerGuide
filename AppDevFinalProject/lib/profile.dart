@@ -32,6 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
               BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
               alignment: Alignment.center,
             ),
+            Text(FirebaseAuth.instance.currentUser!.displayName.toString(), style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
             Text(FirebaseAuth.instance.currentUser!.email.toString(), style: TextStyle(fontSize: 20)),
             SizedBox(
               height: 30,
