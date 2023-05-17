@@ -27,7 +27,7 @@ class Item {
   final String itemName;
   final String itemType;
   final double itemCost; 
-
+  
   Item({
     required this.itemName,
     required this.itemType,
@@ -49,6 +49,7 @@ class Item {
     );
   }
 }
+
 
 class ItemsList {
   final String type;
@@ -103,31 +104,55 @@ class ItemsList {
 }
 
 
-class RecipiesList extends ItemsList{
-  final String imageId;
+class RecipiesList {
+  final String title;
+  final String description;
   final String instructions;
+  final String imageURL;
+  final ItemsList itemsList;
 
-  RecipiesList({required String type, required String itemListTitle,required List<Item> itemList, required this.imageId,required this.instructions})
-      : super(type: type, itemListTitle: itemListTitle, itemList: itemList);
+  RecipiesList({
+    required this.title,
+    required this.description,
+    required this.instructions,
+    required this.imageURL,
+    required this.itemsList,
+  });
 
   Map<String, dynamic> toJson() => {
-    'type' : type,
-    'itemListTitle' : itemListTitle,
-    'itemList' : itemList.map((e) => e.toJson()).toList(),
-    'totalCost' : totalCost,
-    'imageId' : imageId,
-    'instructions' : instructions
+    'title': title,
+    'description': description,
+    'instructions': instructions,
+    'imageURL': imageURL,
+    'itemsList': itemsList.toJson(),
   };
 
-  factory RecipiesList.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory RecipiesList.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data()!;
+    final itemsListData = data['itemsList'] as Map<String, dynamic>;
+    final itemListData = itemsListData['itemList'] as List<dynamic>;
+
+    final itemList = itemListData
+        .map((item) => Item(
+      itemName: item['itemName'],
+      itemType: item['itemType'],
+      itemCost: item['itemCost']?.toDouble() ?? 0.0,
+    ))
+        .toList();
+
+    final itemsList = ItemsList(
+      type: itemsListData['type'],
+      itemListTitle: itemsListData['itemListTitle'],
+      itemList: itemList,
+      totalCost: itemsListData['totalCost']?.toDouble() ?? 0.0,
+    );
 
     return RecipiesList(
-      itemListTitle: getStringOrDefault(data["itemListTitle"]),
-      imageId: getStringOrDefault(data["imageId"]),
-      instructions: getStringOrDefault(data["instructions"]),
-      type: getStringOrDefault(data["type"]),
-      itemList: getItemList(data["itemList"]),
+      title: data['title'],
+      description: data['description'],
+      instructions: data['instructions'],
+      imageURL: data['imageURL'],
+      itemsList: itemsList,
     );
   }
 }
