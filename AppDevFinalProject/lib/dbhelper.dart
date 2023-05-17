@@ -301,12 +301,10 @@ class DatabaseHelper{
         final itemName = data['itemName'] as String?;
         final itemType = data['itemType'] as String?;
         final itemCost = data['itemCost'] as double?;
-        // ... add more properties as needed ...
         return Item(
           itemName: itemName ?? '',
           itemType: itemType ?? '',
           itemCost: itemCost ?? 0.0,
-          // ... add more properties as needed ...
         );
       }).toList();
       return items;
