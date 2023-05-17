@@ -23,23 +23,30 @@ List<Item> getItemList(dynamic value){
 
 
 
-class Item{
+class Item {
   final String itemName;
   final String itemType;
-  double itemCost;
+  final double itemCost; 
 
-  Item({required this.itemName,required this.itemType, this.itemCost = 0});
-
+  Item({
+    required this.itemName,
+    required this.itemType,
+    required this.itemCost,
+  });
 
   Map<String, dynamic> toJson() => {
-    'itemName' : itemName,
-    'itemType' : itemType,
-    'itemCost' : itemCost
+    'itemName': itemName,
+    'itemType': itemType,
+    'itemCost': itemCost, 
   };
 
   factory Item.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    final data = document.data();
-    return Item(itemName: data!["itemName"], itemType: data!["itemType"], itemCost: data!['itemCost']);
+    final data = document.data()!;
+    return Item(
+      itemName: data["itemName"],
+      itemType: data["itemType"],
+      itemCost: data['itemCost']?.toDouble(), 
+    );
   }
 }
 
@@ -62,7 +69,7 @@ class ItemsList {
     totalCost = 0;
     itemList.forEach((e) {
       if (e.itemCost != null) {
-        totalCost += double.parse(e.itemCost.toString());
+        totalCost += e.itemCost!;
       }
     });
   }
@@ -76,23 +83,25 @@ class ItemsList {
 
   factory ItemsList.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
     final data = document.data()!;
-    print(data);
     final itemList = (data['itemList'] as List<dynamic>)
         .map((item) => Item(
       itemName: item['itemName'],
       itemType: item['itemType'],
-      itemCost: item['itemCost']?.toDouble(),
+      itemCost: item['itemCost']?.toDouble() ?? 0.0,
     ))
         .toList();
+
+    final totalCost = data['totalCost'] != null ? data['totalCost'].toDouble() : 0.0;
 
     return ItemsList(
       itemListTitle: data['itemListTitle'],
       type: data['type'],
       itemList: itemList,
-      totalCost: data['totalCost']?.toDouble(),
+      totalCost: totalCost,
     );
   }
 }
+
 
 class RecipiesList extends ItemsList{
   final String imageId;
