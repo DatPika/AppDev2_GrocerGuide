@@ -140,7 +140,7 @@ class _ItemsPageState extends State<ItemsPage> {
                                 globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
                               }
                               else{
-                                globals.db.createItem(Item(itemName: name.text, itemType: type.text));
+                                globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: 0.0));
                               }
                               Navigator.of(context).pop();
                             },
