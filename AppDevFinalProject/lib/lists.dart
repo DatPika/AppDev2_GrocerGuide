@@ -79,7 +79,17 @@ class _ListsPageState extends State<ListsPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                    onPressed: () {}, icon: Icon(Icons.edit)),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ListDetails(
+                                            itemsList: snapshot.data![index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: Icon(Icons.open_in_new)),
                                 IconButton(
                                     onPressed: () {
                                       globals.db.deleteItemsList(
@@ -168,13 +178,13 @@ class _ListsPageState extends State<ListsPage> {
                             Navigator.pushNamed(context, "MyHomePage");
                           });
                         },
-                        child: Text('Save'),
+                        child: Text('Save', style: TextStyle(color: globals.mainColor),),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text('Cancel'),
+                        child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
                       ),
                     ],
                   ),
@@ -189,6 +199,23 @@ class _ListsPageState extends State<ListsPage> {
     );
   }
 }
+
+class ListDetails extends StatefulWidget {
+  final ItemsList itemsList;
+  const ListDetails({Key? key, required this.itemsList}) : super(key: key);
+
+  @override
+  State<ListDetails> createState() => _ListDetailsState();
+}
+
+class _ListDetailsState extends State<ListDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+
 class ItemListWidget extends StatefulWidget {
   final List<Item> itemList;
   final List<Item> selectedItems;
@@ -209,6 +236,7 @@ class _ItemListWidgetState extends State<ItemListWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: globals.mainColor,
         title: Text('Item List'),
       ),
       body: ListView.builder(
@@ -220,6 +248,7 @@ class _ItemListWidgetState extends State<ItemListWidget> {
           return ListTile(
             title: Text(item.itemName),
             leading: Checkbox(
+              activeColor: globals.mainColor,
               value: isChecked,
               onChanged: (value) {
                 setState(() {
