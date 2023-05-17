@@ -19,6 +19,8 @@ class DatabaseHelper {
         print(a.email);
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: a.email, password: password.text.trim());
+
+        FirebaseAuth.instance.currentUser?.updateDisplayName(id.text.trim());
         return true;
       }
     } on FirebaseAuthException catch (e) {
@@ -261,7 +263,8 @@ class DatabaseHelper {
       print(e);
     }
   }
-//TODO have to modify this
+
+  //TODO have to modify this
   // updateRecipiesList(RecipiesList recipiesList) async {
   //   try {
   //     firestore
