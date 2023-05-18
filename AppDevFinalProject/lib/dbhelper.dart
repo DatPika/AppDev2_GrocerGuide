@@ -20,7 +20,7 @@ class DatabaseHelper {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: a.email, password: password.text.trim());
 
-        FirebaseAuth.instance.currentUser?.updateDisplayName(id.text.trim());
+        await FirebaseAuth.instance.currentUser?.updateDisplayName(id.text.trim());
         return true;
       }
     } on FirebaseAuthException catch (e) {
