@@ -191,9 +191,10 @@ class DatabaseHelper {
     }
   }
 
-  updateItem(Item item) async {
+  updateItem(String ogName, Item item) async {
     try {
-      firestore.collection('items').doc(item.itemName).update(item.toJson());
+      firestore.collection('items').doc(ogName).delete();
+      firestore.collection('items').doc(item.itemName).set(item.toJson());
     } catch (e) {
       print(e);
     }

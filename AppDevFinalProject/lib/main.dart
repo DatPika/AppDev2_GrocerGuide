@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ListsPage(),
     RecipiesPage(),
     StoresListsPage(),
-    CartList(),
+    // CartList(),
     SettingsPage(),
   ];
 
@@ -142,14 +142,14 @@ class _MyHomePageState extends State<MyHomePage> {
               activeIcon: Icon(Icons.store_outlined, color: globals.mainColor, size: 35),
               label: 'Stores'),
 
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.shopping_cart,
-                color: Colors.grey,
-                size: 30,
-              ),
-              activeIcon: Icon(Icons.shopping_cart_outlined, color: globals.mainColor, size: 35),
-              label: 'My Cart'),
+          // BottomNavigationBarItem(
+          //     icon: Icon(
+          //       Icons.shopping_cart,
+          //       color: Colors.grey,
+          //       size: 30,
+          //     ),
+          //     activeIcon: Icon(Icons.shopping_cart_outlined, color: globals.mainColor, size: 35),
+          //     label: 'My Cart'),
 
           BottomNavigationBarItem(
             icon: Icon(

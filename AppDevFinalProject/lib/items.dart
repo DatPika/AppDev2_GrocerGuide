@@ -59,16 +59,34 @@ class _ItemsPageState extends State<ItemsPage> {
                                       children: [
                                         IconButton(
                                             onPressed: () {
-                                              print(snapshot.data![index].itemCost);
+                                              editNewItem(context, snapshot.data![index].itemName, snapshot.data![index].itemType, snapshot.data![index].itemCost);
                                             },
                                             icon: Icon(Icons.edit)
                                         ),
 
                                         IconButton(
                                             onPressed: () {
-                                              globals.db.deleteItem(snapshot.data![index].itemName);
-                                              Navigator.pop(context);  // pop current page
-                                              Navigator.pushNamed(context, "MyHomePage");
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) => AlertDialog(
+                                                  title: Text("Are you sure you want to delete"),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        globals.db.deleteItem(snapshot.data![index].itemName);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Delete', style: TextStyle(color: globals.mainColor),),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
                                             },
                                             icon: Icon(Icons.delete)
                                         ),
@@ -162,6 +180,68 @@ void addNewItem(BuildContext context) {
                 Navigator.of(context).pop();
               },
               child: Text('Add')
+          )
+        ],
+      ),
+    ),
+  )
+  );
+}
+
+void editNewItem(BuildContext context, String name1, String type1, double cost1) {
+  TextEditingController name = TextEditingController(text: name1);
+  TextEditingController type = TextEditingController(text: type1);
+  TextEditingController cost = TextEditingController(text: cost1.toString());
+
+  showDialog(context: context, builder: (BuildContext context) => new AlertDialog(
+    title: Text("Edit Item"),
+    content: Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+              controller: name,
+              decoration: InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Item Name'
+              ),
+
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+              controller: type,
+              decoration: InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Item Type'
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+                controller: cost,
+                decoration: InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Item Cost'
+                ),
+                keyboardType: TextInputType.number
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                if (double.parse(cost.text) > 0){
+                  globals.db.updateItem(name1, Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
+                }
+                else{
+                  globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: 0.0));
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Update')
           )
         ],
       ),
