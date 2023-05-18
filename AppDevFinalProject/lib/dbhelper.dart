@@ -248,17 +248,16 @@ class DatabaseHelper {
     }
   }
 
-  //TODO have to modify this
-  // createRecipiesList(RecipiesList recipiesList) async {
-  //   try {
-  //     await firestore
-  //         .collection('recipiesList')
-  //         .doc(recipiesList.itemListTitle)
-  //         .set(recipiesList.toJson());
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  createRecipiesList(RecipiesList recipiesList) async {
+    try {
+      await firestore
+          .collection('recipiesList')
+          .doc(recipiesList.title)
+          .set(recipiesList.toJson());
+    } catch (e) {
+      print(e);
+    }
+  }
 
   readRecipiesList(String itemsListName) async {
     DocumentSnapshot documentSnapshot;
@@ -271,17 +270,16 @@ class DatabaseHelper {
     }
   }
 
-  //TODO have to modify this
-  // updateRecipiesList(RecipiesList recipiesList) async {
-  //   try {
-  //     firestore
-  //         .collection('recipiesList')
-  //         .doc(recipiesList.itemListTitle)
-  //         .update(recipiesList.toJson());
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+  updateRecipiesList(RecipiesList recipiesList) async {
+    try {
+      firestore
+          .collection('recipiesList')
+          .doc(recipiesList.title)
+          .update(recipiesList.toJson());
+    } catch (e) {
+      print(e);
+    }
+  }
 
   deleteRecipiesList(String temsListName) async {
     try {

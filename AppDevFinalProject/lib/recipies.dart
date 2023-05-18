@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Model.dart';
+import './item_lists.dart';
 import 'globals.dart' as globals;
 
 class RecipiesPage extends StatefulWidget {
@@ -14,6 +15,8 @@ class _RecipiesPageState extends State<RecipiesPage> {
   CollectionReference recipeCollection =
       globals.db.firestore.collection('recipiesList');
   late Stream<QuerySnapshot> itemStream;
+  List<ItemsList> existingLists = [];
+  List<ItemsList> itemLists = [];
 
   Future<List<RecipiesList>> getAllRecipe() async {
     print("bob");
@@ -24,6 +27,15 @@ class _RecipiesPageState extends State<RecipiesPage> {
   void initState() {
     super.initState();
     itemStream = recipeCollection.snapshots();
+
+    Future<void> loadItems() async {
+      List<ItemsList> lists = await globals.db.allItemsList();
+      setState(() {
+        existingLists = lists;
+      });
+    }
+
+    loadItems();
   }
 
   @override
@@ -31,71 +43,187 @@ class _RecipiesPageState extends State<RecipiesPage> {
     recipeCollection.get();
     recipeCollection.snapshots();
     return Scaffold(
-        body: FutureBuilder<List<RecipiesList>>(
-      future: getAllRecipe(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          print(snapshot);
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (c, index) {
-                return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Image.network(
-                        snapshot.data![index].imageURL,
-                        width: 400,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          children: [
-                            Text(
-                              snapshot.data![index].title,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+        body: Center(
+          child: Column(
+            children: [
+              Expanded(
+                child: FutureBuilder<List<RecipiesList>>(
+                  future: getAllRecipe(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      print(snapshot);
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (c, index) {
+                            return Card(
+                              elevation: 2,
+                              margin: const EdgeInsets.all(10),
+                              child: Column(
+                                children: [
+                                  Image.network(
+                                    snapshot.data![index].imageURL,
+                                    width: 400,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          snapshot.data![index].title,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          snapshot.data![index].description,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => RecipeDetailPage(
+                                                  recipe: snapshot.data![index],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('More'),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
+                            );
+                          },
+                        );
+                      }
+                    }
+
+                    return Center(
+                        child: CircularProgressIndicator(color: globals.mainColor));
+                  },
+                )
+              ),
+              ElevatedButton(
+                style: ButtonStyle(),
+                onPressed: () async {
+                  ItemsList? selectedList;
+                  List<ItemsList> existingLists = [];
+                  ItemsList list;
+
+                  Future<void> loadLists() async {
+                    List<ItemsList> lists = await globals.db.allItemsList();
+                    setState(() {
+                      existingLists = lists;
+                    });
+                  }
+
+                  loadLists();
+
+                  TextEditingController title = TextEditingController();
+                  TextEditingController description = TextEditingController();
+                  TextEditingController instructions = TextEditingController();
+                  TextEditingController imageURL = TextEditingController(text: 'https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-03/plant-based-food-mc-220323-02-273c7b.jpg');
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: Text("Add Recipe"),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextField(
+                            controller: title,
+                            decoration: InputDecoration(
+                              labelText: 'Title',
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              snapshot.data![index].description,
-                              style: const TextStyle(fontSize: 16),
+                          ),
+                          TextField(
+                            controller: description,
+                            decoration: InputDecoration(
+                              labelText: 'Desciption',
                             ),
-                            const SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () {
+                          ),
+                          TextField(
+                            controller: instructions,
+                            decoration: InputDecoration(
+                              labelText: 'Instructions',
+                            ),
+                          ),
+                          TextFormField(
+                            controller: imageURL,
+                            decoration: InputDecoration(
+                              labelText: 'Image URL',
+                            ),
+                          ),
+                          ElevatedButton(
+                              onPressed: () async {
+
+                                // Navigate to ItemListWidget and pass necessary data
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => RecipeDetailPage(
-                                      recipe: snapshot.data![index],
+                                    builder: (context) => ItemListsWidget(
+                                      itemLists: existingLists,
+                                      selectedList: selectedList,
+                                      onListSelected: (selectedList) {
+                                        setState(() {
+                                          list = selectedList;
+                                        });
+                                      },
                                     ),
                                   ),
                                 );
                               },
-                              child: const Text('More'),
-                            ),
-                          ],
+                              child: Text("Select items list")
+                          )
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () async {
+                            final recipe = RecipiesList(
+                              title: title.text,
+                              description: description.text,
+                              imageURL: imageURL.text,
+                              instructions: instructions.text,
+                              itemsList: selectedList!
+                            );
+                            globals.db.createRecipiesList(recipe).whenComplete(() {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, "MyHomePage");
+                            });
+                          },
+                          child: Text('Save', style: TextStyle(color: globals.mainColor),),
                         ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            );
-          }
-        }
-
-        return Center(
-            child: CircularProgressIndicator(color: globals.mainColor));
-      },
-    ));
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Text(
+                  'Add Recipe',
+                  style: TextStyle(fontSize: 24, color: Colors.white),
+                )
+              ),
+            ],
+          ),
+        )
+    );
   }
 }
 
