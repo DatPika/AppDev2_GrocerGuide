@@ -157,28 +157,45 @@ class RecipiesList {
   }
 }
 
-class StoresList extends ItemsList {
+class StoresList{
   final String storeName;
+  final ItemsList itemsList;
 
-  StoresList({required String type, required String itemListTitle,required List<Item> itemList, required this.storeName})
-      : super(type: type, itemListTitle: itemListTitle, itemList: itemList);
+  StoresList({
+    required this.storeName,
+    required this.itemsList
+  });
+
 
   Map<String, dynamic> toJson() => {
-    'type' : type,
-    'itemListTitle' : itemListTitle,
-    'itemList' : itemList.map((e) => e.toJson()).toList(),
-    'totalCost' : totalCost,
-    'storeName' : storeName
+    'storeName' : storeName,
+    'itemList': itemsList.toJson(),
   };
 
-  factory StoresList.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory StoresList.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
+    final data = document.data()!;
+    final itemsListData = data['itemList'] as Map<String, dynamic>;
+    final itemListData = itemsListData['itemList'] as List<dynamic>;
+
+    final itemList = itemListData
+        .map((item) => Item(
+      itemName: item['itemName'],
+      itemType: item['itemType'],
+      itemCost: item['itemCost']?.toDouble() ?? 0.0,
+    ))
+        .toList();
+
+    final itemsList = ItemsList(
+      type: itemsListData['type'],
+      itemListTitle: itemsListData['itemListTitle'],
+      itemList: itemList,
+      totalCost: itemsListData['totalCost']?.toDouble() ?? 0.0,
+    );
 
     return StoresList(
-      itemListTitle: getStringOrDefault(data["itemListTitle"]),
-      storeName: getStringOrDefault(data["storeName"]),
-      type: getStringOrDefault(data["type"]),
-      itemList: getItemList(data["itemList"]),
+      storeName: data['storeName'],
+      itemsList: itemsList,
+
     );
   }
 

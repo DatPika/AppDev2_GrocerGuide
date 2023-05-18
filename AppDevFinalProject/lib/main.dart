@@ -200,7 +200,7 @@ class _LoginState extends State<Login> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontFamily: globals.fontFamily,
-                          fontSize: 65,
+                          fontSize: 40,
                           fontWeight: FontWeight.bold),
                     ),
                     alignment: Alignment.center,
@@ -378,7 +378,7 @@ class _RegisterState extends State<Register> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontFamily: globals.fontFamily,
-                          fontSize: 75,
+                          fontSize: 40,
                           fontWeight: FontWeight.bold),
                     ),
                     alignment: Alignment.center,
@@ -486,5 +486,7 @@ class _RegisterState extends State<Register> {
     ));
   }
 }
+
+
 
 

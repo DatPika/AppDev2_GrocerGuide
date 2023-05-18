@@ -1,11 +1,20 @@
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Model.dart';
+import 'globals.dart' as globals;
 import 'dbhelper.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+}
+
 var i = Item(itemName: "corn", itemType: 'vegetable', itemCost: 50);
-var i2 = Item(itemName: "pita", itemType: 'bread');
+var i2 = Item(itemName: "pita", itemType: 'bread', itemCost: 0);
 var i3 = Item(itemName: "apple", itemType: 'fruit', itemCost: 50);
 var i4 = Item(itemName: "chips", itemType: 'not good', itemCost: 50);
 var i5 = Item(itemName: "beverage", itemType: 'water', itemCost: 50);
@@ -17,12 +26,6 @@ var d2 = Item(itemName: "pita", itemType: 'bread', itemCost: 10);
 var d3 = Item(itemName: "apple", itemType: 'fruit', itemCost: 10);
 var d4 = Item(itemName: "chips", itemType: 'not good', itemCost: 10);
 late List<Item> itemList2 = [d, d2, d3, d4];
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -47,7 +50,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final db = new DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -59,65 +61,65 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ListView(
           children: <Widget>[
             ElevatedButton(onPressed: () {
-              db.createItem(i5);
+              globals.db.createItem(i5);
             }, child: Text('Create'),),
             ElevatedButton(onPressed: () {
-              db.readItem("Pita");
+              globals.db.readItem("Pita");
             }, child: Text('Read'),),
             ElevatedButton(onPressed: () {
-              db.updateItem(i6);
+              globals.db.updateItem(i6);
             }, child: Text('Update'),),
             ElevatedButton(onPressed: () {
-              db.deleteItem('Pita');
+              globals.db.deleteItem('Pita');
             }, child: Text('Delete'),),
 
             ElevatedButton(onPressed: () {
-              db.createItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+              globals.db.createItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
             }, child: Text('create list'),),
 
             ElevatedButton(onPressed: () {
-              db.readItemsList('foodToBuy');
+              globals.db.readItemsList('foodToBuy');
             }, child: Text('read list'),),
 
             ElevatedButton(onPressed: () {
-              db.updateItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+              globals.db.updateItemsList(ItemsList(type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
             }, child: Text('update list'),),
 
             ElevatedButton(onPressed: () {
-              db.deleteItemsList('foodToBuy');
+              globals.db.deleteItemsList('foodToBuy');
             }, child: Text('delete list'),),
 
-            ElevatedButton(onPressed: () {
-              db.createRecipiesList(RecipiesList(imageId: "hehhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
-            }, child: Text('create recipies list'),),
+            // ElevatedButton(onPressed: () {
+            //   globals.db.createRecipiesList(RecipiesList(imageId: "hehhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+            // }, child: Text('create recipies list'),),
+            //
+            // ElevatedButton(onPressed: () {
+            //   globals.db.readRecipiesList('foodToBuy');
+            // }, child: Text('read recipies list'),),
+            //
+            // ElevatedButton(onPressed: () {
+            //   globals.db.updateRecipiesList(RecipiesList(imageId: "hohohohhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+            // }, child: Text('update recipies list'),),
+            //
+            // ElevatedButton(onPressed: () {
+            //   globals.db.deleteRecipiesList('foodToBuy');
+            // }, child: Text('delete recipies list'),),
+
 
             ElevatedButton(onPressed: () {
-              db.readRecipiesList('foodToBuy');
-            }, child: Text('read recipies list'),),
-
-            ElevatedButton(onPressed: () {
-              db.updateRecipiesList(RecipiesList(imageId: "hohohohhehe",instructions: "1. eat \n 2. eat \n 3. eat" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
-            }, child: Text('update recipies list'),),
-
-            ElevatedButton(onPressed: () {
-              db.deleteRecipiesList('foodToBuy');
-            }, child: Text('delete recipies list'),),
-
-
-            ElevatedButton(onPressed: () {
-              db.createStoresList(StoresList(storeName: "hehhehe" ,type: 'food', itemListTitle: 'foodToBuy', itemList: itemList));
+              globals.db.createStoresList(StoresList(storeName: 'store3', itemsList: ItemsList(type: 'potato', itemListTitle: 'coolTitle', itemList: itemList)));
             }, child: Text('create Stores list'),),
 
             ElevatedButton(onPressed: () {
-              db.readStoresList('foodToBuy');
+              globals.db.readStoresList('foodToBuy');
             }, child: Text('read Stores list'),),
 
-            ElevatedButton(onPressed: () {
-              db.updateStoresList(StoresList(storeName: "hohohohhehe",type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
-            }, child: Text('update Stores list'),),
+            // ElevatedButton(onPressed: () {
+            //   globals.db.updateStoresList(StoresList(storeName: "hohohohhehe",type: 'food', itemListTitle: 'foodToBuy', itemList: itemList2));
+            // }, child: Text('update Stores list'),),
 
             ElevatedButton(onPressed: () {
-              db.deleteStoresList('foodToBuy');
+              globals.db.deleteStoresList('foodToBuy');
             }, child: Text('delete Stores list'),),
           ],
         ),

@@ -117,6 +117,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: globals.mainColor,
         title: Text(widget.recipe.title),
       ),
       body: SingleChildScrollView(

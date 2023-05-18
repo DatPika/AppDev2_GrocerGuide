@@ -135,6 +135,13 @@ class DatabaseHelper {
     return itemData;
   }
 
+  Future<List<StoresList>> allStores() async {
+    final snapshot = await firestore.collection('storesList').get();
+    final itemData =
+      snapshot.docs.map((e) => StoresList.fromSnapshot(e)).toList();
+    return itemData;
+  }
+
   Future<Item> allItemFromList(
       DocumentSnapshot<Map<String, dynamic>> document) async {
     final itemData = Item.fromSnapshot(document);
@@ -288,7 +295,7 @@ class DatabaseHelper {
     try {
       await firestore
           .collection('storesList')
-          .doc(storesList.itemListTitle)
+          .doc(storesList.storeName)
           .set(storesList.toJson());
     } catch (e) {
       print(e);
@@ -310,7 +317,7 @@ class DatabaseHelper {
     try {
       firestore
           .collection('storesList')
-          .doc(storesList.itemListTitle)
+          .doc(storesList.storeName)
           .update(storesList.toJson());
     } catch (e) {
       print(e);
@@ -350,6 +357,15 @@ class DatabaseHelper {
     try {
       await firestore.collection('itemsList').doc(itemsList.itemListTitle).set(
             itemsList.toJson(),
+          );
+    } catch (e) {
+      print(e);
+    }
+  }
+  insertStoreList(StoresList StoresList) async {
+    try {
+      await firestore.collection('storesList').doc(StoresList.storeName).set(
+        StoresList.toJson(),
           );
     } catch (e) {
       print(e);

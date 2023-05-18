@@ -74,7 +74,9 @@ class _ItemsPageState extends State<ItemsPage> {
                                         ),
                                       ],
                                     ),
-                                  )
+                                  ),
+                                  Divider(
+                                    color: globals.mainColor,)
                                 ],
                               );
                             },
@@ -89,66 +91,7 @@ class _ItemsPageState extends State<ItemsPage> {
               ElevatedButton(
                   style: ButtonStyle(),
                   onPressed: () async{
-                    TextEditingController name = TextEditingController();
-                    TextEditingController type = TextEditingController();
-                    TextEditingController cost = TextEditingController();
-
-                    showDialog(context: context, builder: (BuildContext context) => new AlertDialog(
-                      title: Text("Add new Item"),
-                      content: Container(
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              child: TextField(
-                                controller: name,
-                                decoration: InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    labelText: 'Item Name'
-                                ),
-
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              child: TextField(
-                                controller: type,
-                                decoration: InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    labelText: 'Item Type'
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              child: TextField(
-                                controller: cost,
-                                decoration: InputDecoration(
-                                    border: UnderlineInputBorder(),
-                                    labelText: 'Item Cost'
-                                ),
-                                  keyboardType: TextInputType.number
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      actions: <Widget>[
-                        ElevatedButton(
-                            onPressed: () {
-                              if (double.parse(cost.text) > 0){
-                                globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
-                              }
-                              else{
-                                globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: 0.0));
-                              }
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Add')
-                        )
-                      ],
-                    )
-                    );
+                    addNewItem(context);
                   },
                   child: Text(
                     'Add Item',
@@ -159,4 +102,70 @@ class _ItemsPageState extends State<ItemsPage> {
       ),
     );
   }
+}
+
+void addNewItem(BuildContext context) {
+  TextEditingController name = TextEditingController();
+  TextEditingController type = TextEditingController();
+  TextEditingController cost = TextEditingController();
+
+  showDialog(context: context, builder: (BuildContext context) =>
+  new AlertDialog(
+    title: Text("Add new Item"),
+    content: Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+              controller: name,
+              decoration: InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Item Name'
+              ),
+
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+              controller: type,
+              decoration: InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Item Type'
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(20),
+            child: TextField(
+                controller: cost,
+                decoration: InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Item Cost'
+                ),
+                keyboardType: TextInputType.number
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                if (double.parse(cost.text) > 0) {
+                  globals.db.createItem(Item(itemName: name.text,
+                      itemType: type.text,
+                      itemCost: double.parse(cost.text)));
+                }
+                else {
+                  globals.db.createItem(Item(
+                      itemName: name.text, itemType: type.text, itemCost: 0.0));
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Add')
+          )
+        ],
+      ),
+    ),
+  )
+  );
 }
