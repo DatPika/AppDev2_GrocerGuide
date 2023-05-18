@@ -4,7 +4,7 @@ import 'globals.dart' as globals;
 
 class ItemListsWidget extends StatefulWidget {
   final List<ItemsList> itemLists;
-  var selectedList;
+  ItemsList? selectedList;
   Function(ItemsList) onListSelected;
 
   ItemListsWidget({
@@ -33,10 +33,10 @@ class _ItemListsWidgetState extends State<ItemListsWidget> {
           title: Row(
             children: [
               IconButton(
-                onPressed: () {
-                  Navigator.pop(context, widget.selectedList);
-                },
-                icon: Icon(Icons.arrow_back)
+                  onPressed: () {
+                    Navigator.pop(context, widget.selectedList);
+                  },
+                  icon: Icon(Icons.arrow_back)
               ),
               Text('Item Lists'),
             ],
@@ -55,14 +55,15 @@ class _ItemListsWidgetState extends State<ItemListsWidget> {
                     leading: SizedBox(
                       width: 100,
                       child: RadioListTile(
-                        groupValue: widget.itemLists,
+                        groupValue: widget.selectedList,
                         activeColor: globals.mainColor,
-                        value: list.itemList,
+                        value: list,
                         onChanged: (value) {
-                            setState(() {
-                              widget.selectedList = list;
+                          setState(() {
+                            widget.selectedList = value as ItemsList?;
                           });
-                        }),
+                        },
+                      ),
                     ),
                   );
                 },
