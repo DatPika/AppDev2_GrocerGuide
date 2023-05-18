@@ -18,7 +18,6 @@ class _ListsPageState extends State<ListsPage> {
   List<Item> existingItems = [];
   List<Item> itemList = [];
 
-
   Future<List<ItemsList>> getAllItemsList() async {
     return await globals.db.allItemsList();
   }
@@ -71,7 +70,6 @@ class _ListsPageState extends State<ListsPage> {
             onPressed: () async {
               List<Item> selectedItems = [];
               List<Item> existingItems = [];
-              List<Item> itemList = [];
 
               Future<void> loadItems() async {
                 List<Item> items = await globals.db.allItems();
@@ -82,30 +80,34 @@ class _ListsPageState extends State<ListsPage> {
 
               loadItems();
 
-
-              TextEditingController storeName = TextEditingController();
+              TextEditingController itemListTitle = TextEditingController();
+              TextEditingController type = TextEditingController();
               TextEditingController totalCost = TextEditingController();
 
               showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: Text("Add Store List"),
+                  title: Text("Add new List"),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       TextField(
-                        controller: storeName,
+                        controller: itemListTitle,
                         decoration: InputDecoration(
-                          labelText: 'Store List Title',
+                          labelText: 'List Title',
                         ),
                       ),
-
-                      SizedBox(height: 10,),
-
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextField(
+                        controller: type,
+                        decoration: InputDecoration(
+                          labelText: 'List Type',
+                        ),
+                      ),
                       ElevatedButton(
                           onPressed: () async {
-                            // Your existing code here
-
                             // Navigate to ItemListWidget and pass necessary data
                             Navigator.push(
                               context,
@@ -129,40 +131,45 @@ class _ListsPageState extends State<ListsPage> {
                     TextButton(
                       onPressed: () async {
                         final itemList = ItemsList(
-                          itemListTitle: storeName.text,
-                          type: "",
+                          itemListTitle: itemListTitle.text,
+                          type: type.text,
                           itemList: selectedItems,
                           totalCost: double.tryParse(totalCost.text) ?? 0.0,
                         );
-                        globals.db.insertStoreList(StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
+                        globals.db.insertItemsList(itemList).whenComplete(() {
                           Navigator.pop(context);
                           Navigator.pushNamed(context, "MyHomePage");
                         });
                       },
-                      child: Text('Save', style: TextStyle(color: globals.mainColor),),
+                      child: Text(
+                        'Save',
+                        style: TextStyle(color: globals.mainColor),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: globals.mainColor),
+                      ),
                     ),
                   ],
                 ),
               );
             },
-            child: Text("Add new Store"),
+            child: Text("Add new List"),
           )
-
         ],
       ),
-
     );
   }
 }
 
 class ListDetails extends StatefulWidget {
   final ItemsList itemsList;
+
   const ListDetails({Key? key, required this.itemsList}) : super(key: key);
 
   @override
@@ -176,9 +183,9 @@ class _ListDetailsState extends State<ListDetails> {
   }
 }
 
-
 class CardBuild extends StatefulWidget {
   final ItemsList list;
+
   const CardBuild({Key? key, required this.list}) : super(key: key);
 
   @override
@@ -247,10 +254,9 @@ class _CardBuildState extends State<CardBuild> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
                   ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         List<Item> selectedItems = [];
                         List<Item> existingItems = widget.list.itemList;
                         List<Item> itemList = [];
@@ -264,9 +270,10 @@ class _CardBuildState extends State<CardBuild> {
 
                         loadItems();
 
-
-                        TextEditingController storeName = TextEditingController(text: widget.list.itemListTitle);
-                        TextEditingController totalCost = TextEditingController();
+                        TextEditingController storeName = TextEditingController(
+                            text: widget.list.itemListTitle);
+                        TextEditingController totalCost =
+                            TextEditingController();
 
                         showDialog(
                           context: context,
@@ -281,9 +288,9 @@ class _CardBuildState extends State<CardBuild> {
                                     labelText: 'List Title',
                                   ),
                                 ),
-
-                                SizedBox(height: 10,),
-
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 ElevatedButton(
                                     onPressed: () async {
                                       // Your existing code here
@@ -314,27 +321,37 @@ class _CardBuildState extends State<CardBuild> {
                                     itemListTitle: storeName.text,
                                     type: "",
                                     itemList: selectedItems,
-                                    totalCost: double.tryParse(totalCost.text) ?? 0.0,
+                                    totalCost:
+                                        double.tryParse(totalCost.text) ?? 0.0,
                                   );
-                                  globals.db.insertStoreList(StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
+                                  globals.db
+                                      .insertStoreList(StoresList(
+                                          storeName: storeName.text.trim(),
+                                          itemsList: itemList))
+                                      .whenComplete(() {
                                     Navigator.pop(context);
                                     Navigator.pushNamed(context, "MyHomePage");
                                   });
                                 },
-                                child: Text('Save', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Save',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                             ],
                           ),
                         );
                       },
-                      child: Text("Edit")
-                  ),
+                      child: Text("Edit")),
                   SizedBox(
                     width: 20,
                   ),
@@ -347,23 +364,29 @@ class _CardBuildState extends State<CardBuild> {
                             actions: [
                               TextButton(
                                 onPressed: () async {
-                                  globals.db.deleteItemsList(widget.list.itemListTitle);
+                                  globals.db.deleteItemsList(
+                                      widget.list.itemListTitle);
                                   Navigator.pop(context);
                                 },
-                                child: Text('Delete', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                             ],
                           ),
                         );
                       },
-                      child: Text("Delete")
-                  ),
+                      child: Text("Delete")),
                 ],
               )
             ],
