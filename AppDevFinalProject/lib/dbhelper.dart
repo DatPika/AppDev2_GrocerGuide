@@ -230,12 +230,16 @@ class DatabaseHelper {
     }
   }
 
-  updateItemsList(ItemsList itemsList) async {
+  updateItemsList(String ogName, ItemsList itemsList) async {
     try {
-      firestore
-          .collection('itemsList')
-          .doc(itemsList.itemListTitle)
-          .update(itemsList.toJson());
+      // firestore
+      //     .collection('itemsList')
+      //     .doc(itemsList.itemListTitle)
+      //     .update(itemsList.toJson());
+      firestore.collection('itemsList').doc(ogName).delete();
+      firestore.collection('itemsList').doc(itemsList.itemListTitle).set(itemsList.toJson());
+
+
     } catch (e) {
       print(e);
     }

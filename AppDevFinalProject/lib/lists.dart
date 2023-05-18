@@ -272,6 +272,8 @@ class _CardBuildState extends State<CardBuild> {
 
                         TextEditingController storeName = TextEditingController(
                             text: widget.list.itemListTitle);
+                        TextEditingController storeType = TextEditingController(
+                            text: widget.list.type);
                         TextEditingController totalCost =
                             TextEditingController();
 
@@ -286,6 +288,12 @@ class _CardBuildState extends State<CardBuild> {
                                   controller: storeName,
                                   decoration: InputDecoration(
                                     labelText: 'List Title',
+                                  ),
+                                ),
+                                TextField(
+                                  controller: storeType,
+                                  decoration: InputDecoration(
+                                    labelText: 'List Type',
                                   ),
                                 ),
                                 SizedBox(
@@ -325,12 +333,11 @@ class _CardBuildState extends State<CardBuild> {
                                         double.tryParse(totalCost.text) ?? 0.0,
                                   );
                                   globals.db
-                                      .insertStoreList(StoresList(
-                                          storeName: storeName.text.trim(),
-                                          itemsList: itemList))
+                                      .updateItemsList(widget.list.itemListTitle,ItemsList(type: storeType.text, itemList: selectedItems,itemListTitle: storeName.text))
                                       .whenComplete(() {
+                                        print(ItemsList(type: storeType.text, itemList: selectedItems,itemListTitle: storeName.text).toJson());
                                     Navigator.pop(context);
-                                    Navigator.pushNamed(context, "MyHomePage");
+                                    // Navigator.pushNamed(context, "MyHomePage");
                                   });
                                 },
                                 child: Text(
