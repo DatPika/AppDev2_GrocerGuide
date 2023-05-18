@@ -180,7 +180,6 @@ class _RecipiesPageState extends State<RecipiesPage> {
                                     ),
                                   ),
                                 );
-                                print(selectedList!.itemListTitle);
                               },
                               child: Text("Select items list")
                           )
