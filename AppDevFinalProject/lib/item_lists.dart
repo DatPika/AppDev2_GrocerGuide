@@ -5,7 +5,7 @@ import 'globals.dart' as globals;
 class ItemListsWidget extends StatefulWidget {
   final List<ItemsList> itemLists;
   var selectedList;
-  final Function(ItemsList) onListSelected;
+  Function(ItemsList) onListSelected;
 
   ItemListsWidget({
     required this.itemLists,
@@ -18,12 +18,29 @@ class ItemListsWidget extends StatefulWidget {
 }
 
 class _ItemListsWidgetState extends State<ItemListsWidget> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: globals.mainColor,
-          title: Text('Item Lists'),
+          title: Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.pop(context, widget.selectedList);
+                },
+                icon: Icon(Icons.arrow_back)
+              ),
+              Text('Item Lists'),
+            ],
+          ),
         ),
         body: Column(
           children: [
@@ -32,7 +49,6 @@ class _ItemListsWidgetState extends State<ItemListsWidget> {
                 itemCount: widget.itemLists.length,
                 itemBuilder: (context, index) {
                   final list = widget.itemLists[index];
-                  bool isChecked = (widget.selectedList == list);
 
                   return ListTile(
                     title: Text(list.itemListTitle),
@@ -43,14 +59,10 @@ class _ItemListsWidgetState extends State<ItemListsWidget> {
                         activeColor: globals.mainColor,
                         value: list.itemList,
                         onChanged: (value) {
-                          setState(() {
-                            if (isChecked) {
+                            setState(() {
                               widget.selectedList = list;
-                            }
-                            widget.onListSelected(widget.selectedList);
                           });
-                        },
-                      ),
+                        }),
                     ),
                   );
                 },

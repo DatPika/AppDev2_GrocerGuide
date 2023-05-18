@@ -19,7 +19,6 @@ class _RecipiesPageState extends State<RecipiesPage> {
   List<ItemsList> itemLists = [];
 
   Future<List<RecipiesList>> getAllRecipe() async {
-    print("bob");
     return await globals.db.allRecipies();
   }
 
@@ -51,7 +50,6 @@ class _RecipiesPageState extends State<RecipiesPage> {
                   future: getAllRecipe(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-                      print(snapshot);
                       if (snapshot.hasData) {
                         return ListView.builder(
                           itemCount: snapshot.data!.length,
@@ -167,14 +165,13 @@ class _RecipiesPageState extends State<RecipiesPage> {
                           ),
                           ElevatedButton(
                               onPressed: () async {
-
                                 // Navigate to ItemListWidget and pass necessary data
-                                Navigator.push(
+                                selectedList = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ItemListsWidget(
                                       itemLists: existingLists,
-                                      selectedList: selectedList,
+                                      selectedList: selectedList ?? existingLists[0],
                                       onListSelected: (selectedList) {
                                         setState(() {
                                           list = selectedList;
@@ -183,6 +180,7 @@ class _RecipiesPageState extends State<RecipiesPage> {
                                     ),
                                   ),
                                 );
+                                print(selectedList!.itemListTitle);
                               },
                               child: Text("Select items list")
                           )
