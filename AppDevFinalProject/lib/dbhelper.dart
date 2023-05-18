@@ -312,12 +312,15 @@ class DatabaseHelper {
     }
   }
 
-  updateStoresList(StoresList storesList) async {
+  updateStoresList(String ogName,StoresList storesList) async {
     try {
-      firestore
-          .collection('storesList')
-          .doc(storesList.storeName)
-          .update(storesList.toJson());
+      // firestore
+      //     .collection('storesList')
+      //     .doc(storesList.storeName)
+      //     .update(storesList.toJson());
+
+      firestore.collection('storesList').doc(ogName).delete();
+      firestore.collection('storesList').doc(storesList.storeName).set(storesList.toJson());
     } catch (e) {
       print(e);
     }

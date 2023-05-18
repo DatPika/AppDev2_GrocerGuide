@@ -286,7 +286,7 @@ class _CardBuildState extends State<CardBuild> {
                                     itemList: selectedItems,
                                     totalCost: double.tryParse(totalCost.text) ?? 0.0,
                                   );
-                                  globals.db.insertStoreList(StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
+                                  globals.db.updateStoresList(widget.store.storeName, StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
                                     Navigator.pop(context);
                                     Navigator.pushNamed(context, "MyHomePage");
                                   });
