@@ -22,10 +22,15 @@ class _ListsPageState extends State<ListsPage> {
     return await globals.db.allItemsList();
   }
 
+  void updateItemStream() {
+    setState(() {
+      itemStream = itemCollection.snapshots();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    itemStream = itemCollection.snapshots();
 
     Future<void> loadItems() async {
       List<Item> items = await globals.db.allItems();
@@ -45,17 +50,55 @@ class _ListsPageState extends State<ListsPage> {
     return Container(
       child: Column(
         children: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Lists',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Here are the lists that you can create from the items you created!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
           Expanded(
             child: FutureBuilder<List<ItemsList>>(
               future: getAllItemsList(),
               builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child:
+                          CircularProgressIndicator(color: globals.mainColor));
+                }
                 if (snapshot.connectionState == ConnectionState.done) {
                   print(snapshot);
                   if (snapshot.hasData) {
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (c, index) {
-                        return CardBuild(list: snapshot.data![index]);
+                        return CardBuild(
+                          list: snapshot.data![index],
+                          onUpdate: updateItemStream,
+                        );
                       },
                     );
                   }
@@ -108,8 +151,7 @@ class _ListsPageState extends State<ListsPage> {
                       ),
                       ElevatedButton(
                           onPressed: () async {
-                            // Navigate to ItemListWidget and pass necessary data
-                            Navigator.push(
+                            List<Item> result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ItemListWidget(
@@ -123,6 +165,12 @@ class _ListsPageState extends State<ListsPage> {
                                 ),
                               ),
                             );
+
+                            if (result != null) {
+                              setState(() {
+                                itemList = result;
+                              });
+                            }
                           },
                           child: Text("Select items"))
                     ],
@@ -136,9 +184,11 @@ class _ListsPageState extends State<ListsPage> {
                           itemList: selectedItems,
                           totalCost: double.tryParse(totalCost.text) ?? 0.0,
                         );
-                        globals.db.insertItemsList(itemList).whenComplete(() {
+                        await globals.db
+                            .insertItemsList(itemList)
+                            .whenComplete(() {
                           Navigator.pop(context);
-                          Navigator.pushNamed(context, "MyHomePage");
+                          updateItemStream();
                         });
                       },
                       child: Text(
@@ -185,8 +235,10 @@ class _ListDetailsState extends State<ListDetails> {
 
 class CardBuild extends StatefulWidget {
   final ItemsList list;
+  final VoidCallback onUpdate;
 
-  const CardBuild({Key? key, required this.list}) : super(key: key);
+  const CardBuild({Key? key, required this.list, required this.onUpdate})
+      : super(key: key);
 
   @override
   State<CardBuild> createState() => _CardBuildState();
@@ -270,28 +322,29 @@ class _CardBuildState extends State<CardBuild> {
 
                         loadItems();
 
-                        TextEditingController storeName = TextEditingController(
-                            text: widget.list.itemListTitle);
-                        TextEditingController storeType = TextEditingController(
-                            text: widget.list.type);
+                        TextEditingController itemListTitle =
+                            TextEditingController(
+                                text: widget.list.itemListTitle);
+                        TextEditingController Listtype =
+                            TextEditingController(text: widget.list.type);
                         TextEditingController totalCost =
                             TextEditingController();
 
                         showDialog(
                           context: context,
                           builder: (BuildContext context) => AlertDialog(
-                            title: Text("Add List"),
+                            title: Text("Edit List"),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextField(
-                                  controller: storeName,
+                                  controller: itemListTitle,
                                   decoration: InputDecoration(
                                     labelText: 'List Title',
                                   ),
                                 ),
                                 TextField(
-                                  controller: storeType,
+                                  controller: Listtype,
                                   decoration: InputDecoration(
                                     labelText: 'List Type',
                                   ),
@@ -326,18 +379,23 @@ class _CardBuildState extends State<CardBuild> {
                               TextButton(
                                 onPressed: () async {
                                   final itemList = ItemsList(
-                                    itemListTitle: storeName.text,
-                                    type: "",
+                                    itemListTitle: itemListTitle.text,
+                                    type: Listtype.text,
                                     itemList: selectedItems,
                                     totalCost:
                                         double.tryParse(totalCost.text) ?? 0.0,
                                   );
-                                  globals.db
-                                      .updateItemsList(widget.list.itemListTitle,ItemsList(type: storeType.text, itemList: selectedItems,itemListTitle: storeName.text))
+                                  await globals.db
+                                      .updateItemsList(
+                                          widget.list.itemListTitle,
+                                          ItemsList(
+                                              type: Listtype.text,
+                                              itemList: selectedItems,
+                                              itemListTitle:
+                                                  itemListTitle.text))
                                       .whenComplete(() {
-                                        print(ItemsList(type: storeType.text, itemList: selectedItems,itemListTitle: storeName.text).toJson());
                                     Navigator.pop(context);
-                                    // Navigator.pushNamed(context, "MyHomePage");
+                                    widget.onUpdate();
                                   });
                                 },
                                 child: Text(
@@ -374,6 +432,7 @@ class _CardBuildState extends State<CardBuild> {
                                   globals.db.deleteItemsList(
                                       widget.list.itemListTitle);
                                   Navigator.pop(context);
+                                  widget.onUpdate();
                                 },
                                 child: Text(
                                   'Delete',
