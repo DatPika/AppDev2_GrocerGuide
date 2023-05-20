@@ -309,8 +309,8 @@ class _CardBuildState extends State<CardBuild> {
                 children: [
                   ElevatedButton(
                       onPressed: () async {
-                        List<Item> selectedItems = [];
-                        List<Item> existingItems = widget.list.itemList;
+                        List<Item> selectedItems = widget.list.itemList;
+                        List<Item> existingItems = []; //items in total
                         List<Item> itemList = [];
 
                         Future<void> loadItems() async {
@@ -321,7 +321,6 @@ class _CardBuildState extends State<CardBuild> {
                         }
 
                         loadItems();
-
                         TextEditingController itemListTitle =
                             TextEditingController(
                                 text: widget.list.itemListTitle);
@@ -354,10 +353,11 @@ class _CardBuildState extends State<CardBuild> {
                                 ),
                                 ElevatedButton(
                                     onPressed: () async {
-                                      // Your existing code here
+                                      // selectedItems.forEach((element) {
+                                      //   print(element.itemName);
+                                      // });
 
-                                      // Navigate to ItemListWidget and pass necessary data
-                                      Navigator.push(
+                                      List<Item> result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => ItemListWidget(
@@ -371,8 +371,13 @@ class _CardBuildState extends State<CardBuild> {
                                           ),
                                         ),
                                       );
+                                      if (result != null) {
+                                        setState(() {
+                                          itemList = result;
+                                        });
+                                      }
                                     },
-                                    child: Text("Select items"))
+                                    child: Text("Edit items in list"))
                               ],
                             ),
                             actions: [
@@ -399,7 +404,7 @@ class _CardBuildState extends State<CardBuild> {
                                   });
                                 },
                                 child: Text(
-                                  'Save',
+                                  'Edit',
                                   style: TextStyle(color: globals.mainColor),
                                 ),
                               ),
