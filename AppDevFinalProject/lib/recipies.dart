@@ -18,6 +18,13 @@ class _RecipiesPageState extends State<RecipiesPage> {
   List<ItemsList> existingLists = [];
   List<ItemsList> itemLists = [];
 
+
+  void updateRecipiesStream() {
+    setState(() {
+      itemStream = recipeCollection.snapshots();
+    });
+  }
+
   Future<List<RecipiesList>> getAllRecipe() async {
     return await globals.db.allRecipies();
   }
@@ -25,7 +32,7 @@ class _RecipiesPageState extends State<RecipiesPage> {
   @override
   void initState() {
     super.initState();
-    itemStream = recipeCollection.snapshots();
+    updateRecipiesStream();
 
     Future<void> loadItems() async {
       List<ItemsList> lists = await globals.db.allItemsList();
@@ -36,6 +43,7 @@ class _RecipiesPageState extends State<RecipiesPage> {
 
     loadItems();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +234,7 @@ class _RecipiesPageState extends State<RecipiesPage> {
                               .createRecipiesList(recipe)
                               .whenComplete(() {
                             Navigator.pop(context);
-                            Navigator.pushNamed(context, "MyHomePage");
+                            updateRecipiesStream();
                           });
                         },
                         child: Text(
