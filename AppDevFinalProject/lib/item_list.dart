@@ -18,22 +18,22 @@ class ItemListWidget extends StatefulWidget {
 }
 
 class _ItemListWidgetState extends State<ItemListWidget> {
-  void updateQuantity(Item item, int quantity) {
-    setState(() {
-      item.quantity = quantity;
-      int index = widget.selectedItems.indexWhere((selectedItem) =>
-          selectedItem.itemName == item.itemName &&
-          selectedItem.itemType == item.itemType);
-
-      if (index != -1) {
-        // If the item already exists, update its quantity
-        widget.selectedItems[index] = item;
-      } else {
-        // If the item is not found, add it to selectedItems
-        widget.selectedItems.add(item);
-      }
-    });
-  }
+  // void updateQuantity(Item item, int quantity) {
+  //   setState(() {
+  //     item.quantity = quantity;
+  //     int index = widget.selectedItems.indexWhere((selectedItem) =>
+  //         selectedItem.itemName == item.itemName &&
+  //         selectedItem.itemType == item.itemType);
+  //
+  //     if (index != -1) {
+  //       // If the item already exists, update its quantity
+  //       widget.selectedItems[index] = item;
+  //     } else {
+  //       // If the item is not found, add it to selectedItems
+  //       widget.selectedItems.add(item);
+  //     }
+  //   });
+  // }
 
   void initState() {
     super.initState();
@@ -63,11 +63,10 @@ class _ItemListWidgetState extends State<ItemListWidget> {
 
                   return ListTile(
                     title: Text(item.itemName),
-                    subtitle: Text('Quantity: ${item.quantity}'),
+                    //subtitle: Text('Quantity: ${item.quantity}'),
                     leading: Checkbox(
                       activeColor: globals.mainColor,
                       value: widget.selectedItems.contains(item),
-                      //can be isCheched
                       onChanged: (value) {
                         setState(() {
                           if (value!) {
@@ -79,25 +78,25 @@ class _ItemListWidgetState extends State<ItemListWidget> {
                         });
                       },
                     ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.remove),
-                          onPressed: () {
-                            if (item.quantity > 1) {
-                              updateQuantity(item, item.quantity - 1);
-                            }
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: () {
-                            updateQuantity(item, item.quantity + 1);
-                          },
-                        ),
-                      ],
-                    ),
+                    // trailing: Row(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: [
+                    //     IconButton(
+                    //       icon: Icon(Icons.remove),
+                    //       onPressed: () {
+                    //         if (item.quantity > 1) {
+                    //           updateQuantity(item, item.quantity - 1);
+                    //         }
+                    //       },
+                    //     ),
+                    //     IconButton(
+                    //       icon: Icon(Icons.add),
+                    //       onPressed: () {
+                    //         updateQuantity(item, item.quantity + 1);
+                    //       },
+                    //     ),
+                    //   ],
+                    // ),
                   );
                 },
               ),
