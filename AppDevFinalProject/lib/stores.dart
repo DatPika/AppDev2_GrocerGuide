@@ -12,7 +12,7 @@ class StoresListsPage extends StatefulWidget {
 
 class _StoresListsPageState extends State<StoresListsPage> {
   CollectionReference storeCollection =
-  globals.db.firestore.collection('storesList');
+      globals.db.firestore.collection('storesList');
   late Stream<QuerySnapshot> itemStream;
 
   Future<List<StoresList>> getAllStores() async {
@@ -23,7 +23,13 @@ class _StoresListsPageState extends State<StoresListsPage> {
   @override
   void initState() {
     super.initState();
-    itemStream = storeCollection.snapshots();
+    updateItemStream();
+  }
+
+  void updateItemStream() {
+    setState(() {
+      itemStream = storeCollection.snapshots();
+    });
   }
 
   @override
@@ -33,113 +39,125 @@ class _StoresListsPageState extends State<StoresListsPage> {
         child: Column(
           children: [
             Expanded(
-                child: FutureBuilder<List<StoresList>>(
-                  future: getAllStores(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      print(snapshot);
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (c, index) {
-                            return CardBuild(store: snapshot.data![index]);
-                          },
-                        );
-                      }
+              child: FutureBuilder<List<StoresList>>(
+                future: getAllStores(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    print(snapshot);
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (c, index) {
+                          return CardBuild(
+                            store: snapshot.data![index],
+                            onUpdate: updateItemStream,
+                          );
+                        },
+                      );
                     }
-
-                    return Center(
-                        child: CircularProgressIndicator(color: globals.mainColor));
-                  },
-                ),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  List<Item> selectedItems = [];
-                  List<Item> existingItems = [];
-                  List<Item> itemList = [];
-
-                  Future<void> loadItems() async {
-                    List<Item> items = await globals.db.allItems();
-                    setState(() {
-                      existingItems = items;
-                    });
                   }
 
-                  loadItems();
+                  return Center(
+                      child:
+                          CircularProgressIndicator(color: globals.mainColor));
+                },
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                List<Item> selectedItems = [];
+                List<Item> existingItems = [];
+                List<Item> itemList = [];
 
+                Future<void> loadItems() async {
+                  List<Item> items = await globals.db.allItems();
+                  setState(() {
+                    existingItems = items;
+                  });
+                }
 
-                  TextEditingController storeName = TextEditingController();
-                  TextEditingController totalCost = TextEditingController();
+                loadItems();
 
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: Text("Add Store List"),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: storeName,
-                            decoration: InputDecoration(
-                              labelText: 'Store List Title',
-                            ),
+                TextEditingController storeName = TextEditingController();
+                TextEditingController totalCost = TextEditingController();
+
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text("Add Store List"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: storeName,
+                          decoration: InputDecoration(
+                            labelText: 'Store List Title',
                           ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton(
+                            onPressed: () async {
+                              // Your existing code here
 
-                          SizedBox(height: 10,),
-
-                          ElevatedButton(
-                              onPressed: () async {
-                                // Your existing code here
-
-                                // Navigate to ItemListWidget and pass necessary data
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemListWidget(
-                                      itemList: existingItems,
-                                      selectedItems: selectedItems,
-                                      onItemsSelected: (selectedItems) {
-                                        setState(() {
-                                          itemList = selectedItems;
-                                        });
-                                      },
-                                    ),
+                              // Navigate to ItemListWidget and pass necessary data
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ItemListWidget(
+                                    itemList: existingItems,
+                                    selectedItems: selectedItems,
+                                    onItemsSelected: (selectedItems) {
+                                      setState(() {
+                                        itemList = selectedItems;
+                                      });
+                                    },
                                   ),
-                                );
-                              },
-                              child: Text("Select items"))
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            final itemList = ItemsList(
-                              itemListTitle: storeName.text,
-                              type: "",
-                              itemList: selectedItems,
-                              totalCost: double.tryParse(totalCost.text) ?? 0.0,
-                            );
-                            globals.db.insertStoreList(StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, "MyHomePage");
-                            });
-                          },
-                          child: Text('Save', style: TextStyle(color: globals.mainColor),),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
-                        ),
+                                ),
+                              );
+                            },
+                            child: Text("Select items"))
                       ],
                     ),
-                  );
-                },
-                child: Text("Add new Store"),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          final itemList = ItemsList(
+                            itemListTitle: storeName.text,
+                            type: "",
+                            itemList: selectedItems,
+                            totalCost: double.tryParse(totalCost.text) ?? 0.0,
+                          );
+                          globals.db
+                              .insertStoreList(StoresList(
+                                  storeName: storeName.text.trim(),
+                                  itemsList: itemList))
+                              .whenComplete(() {
+                            Navigator.pop(context);
+                            updateItemStream();
+                          });
+                        },
+                        child: Text(
+                          'Save',
+                          style: TextStyle(color: globals.mainColor),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: globals.mainColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text("Add new Store"),
             )
-
           ],
         ),
       ),
@@ -149,7 +167,10 @@ class _StoresListsPageState extends State<StoresListsPage> {
 
 class CardBuild extends StatefulWidget {
   final StoresList store;
-  const CardBuild({Key? key, required this.store}) : super(key: key);
+  final VoidCallback onUpdate;
+
+  const CardBuild({Key? key, required this.store, required this.onUpdate})
+      : super(key: key);
 
   @override
   State<CardBuild> createState() => _CardBuildState();
@@ -217,12 +238,12 @@ class _CardBuildState extends State<CardBuild> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
                   ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         List<Item> selectedItems = [];
-                        List<Item> existingItems = widget.store.itemsList.itemList;
+                        List<Item> existingItems =
+                            widget.store.itemsList.itemList;
                         List<Item> itemList = [];
 
                         Future<void> loadItems() async {
@@ -234,9 +255,10 @@ class _CardBuildState extends State<CardBuild> {
 
                         loadItems();
 
-
-                        TextEditingController storeName = TextEditingController(text: widget.store.storeName);
-                        TextEditingController totalCost = TextEditingController();
+                        TextEditingController storeName =
+                            TextEditingController(text: widget.store.storeName);
+                        TextEditingController totalCost =
+                            TextEditingController();
 
                         showDialog(
                           context: context,
@@ -251,9 +273,9 @@ class _CardBuildState extends State<CardBuild> {
                                     labelText: 'Store List Title',
                                   ),
                                 ),
-
-                                SizedBox(height: 10,),
-
+                                SizedBox(
+                                  height: 10,
+                                ),
                                 ElevatedButton(
                                     onPressed: () async {
                                       // Your existing code here
@@ -284,27 +306,39 @@ class _CardBuildState extends State<CardBuild> {
                                     itemListTitle: storeName.text,
                                     type: "",
                                     itemList: selectedItems,
-                                    totalCost: double.tryParse(totalCost.text) ?? 0.0,
+                                    totalCost:
+                                        double.tryParse(totalCost.text) ?? 0.0,
                                   );
-                                  globals.db.updateStoresList(widget.store.storeName, StoresList(storeName: storeName.text.trim(), itemsList: itemList)).whenComplete(() {
+                                  globals.db
+                                      .updateStoresList(
+                                          widget.store.storeName,
+                                          StoresList(
+                                              storeName: storeName.text.trim(),
+                                              itemsList: itemList))
+                                      .whenComplete(() {
                                     Navigator.pop(context);
-                                    Navigator.pushNamed(context, "MyHomePage");
+                                    widget.onUpdate();
                                   });
                                 },
-                                child: Text('Save', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Save',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                             ],
                           ),
                         );
                       },
-                      child: Text("Edit")
-                  ),
+                      child: Text("Edit")),
                   SizedBox(
                     width: 20,
                   ),
@@ -317,23 +351,30 @@ class _CardBuildState extends State<CardBuild> {
                             actions: [
                               TextButton(
                                 onPressed: () async {
-                                  globals.db.deleteStoresList(widget.store.storeName);
+                                  globals.db
+                                      .deleteStoresList(widget.store.storeName);
                                   Navigator.pop(context);
+                                  widget.onUpdate();
                                 },
-                                child: Text('Delete', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Delete',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: globals.mainColor),
+                                ),
                               ),
                             ],
                           ),
                         );
                       },
-                      child: Text("Delete")
-                  ),
+                      child: Text("Delete")),
                 ],
               )
             ],
@@ -363,13 +404,13 @@ class _ItemListWidgetState extends State<ItemListWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: globals.mainColor,
-        title: Text('Item List'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
+        appBar: AppBar(
+          backgroundColor: globals.mainColor,
+          title: Text('Item List'),
+        ),
+        body: Column(
+          children: [
+            Expanded(
               child: ListView.builder(
                 itemCount: widget.itemList.length,
                 itemBuilder: (context, index) {
@@ -395,16 +436,14 @@ class _ItemListWidgetState extends State<ItemListWidget> {
                   );
                 },
               ),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                addNewItem(context);
-              },
-              child: Text("Add new Item")
-          )
-        ],
-      )
-    );
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  addNewItem(context);
+                },
+                child: Text("Add new Item"))
+          ],
+        ));
   }
 }
 
@@ -413,59 +452,59 @@ void addNewItem(BuildContext context) {
   TextEditingController type = TextEditingController();
   TextEditingController cost = TextEditingController();
 
-  showDialog(context: context, builder: (BuildContext context) => new AlertDialog(
-    title: Text("Add new Item"),
-    content: Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              controller: name,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Item Name'
+  showDialog(
+      context: context,
+      builder: (BuildContext context) => new AlertDialog(
+            title: Text("Add new Item"),
+            content: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: TextField(
+                      controller: name,
+                      decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Item Name'),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: TextField(
+                      controller: type,
+                      decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Item Type'),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    child: TextField(
+                        controller: cost,
+                        decoration: InputDecoration(
+                            border: UnderlineInputBorder(),
+                            labelText: 'Item Cost'),
+                        keyboardType: TextInputType.number),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        if (double.parse(cost.text) > 0) {
+                          globals.db.createItem(Item(
+                              itemName: name.text,
+                              itemType: type.text,
+                              itemCost: double.parse(cost.text)));
+                        } else {
+                          globals.db.createItem(Item(
+                              itemName: name.text,
+                              itemType: type.text,
+                              itemCost: 0.0));
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Add'))
+                ],
               ),
-
             ),
-          ),
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              controller: type,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Item Type'
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-                controller: cost,
-                decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Item Cost'
-                ),
-                keyboardType: TextInputType.number
-            ),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                if (double.parse(cost.text) > 0){
-                  globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
-                }
-                else{
-                  globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: 0.0));
-                }
-                Navigator.of(context).pop();
-              },
-              child: Text('Add')
-          )
-        ],
-      ),
-    ),
-  )
-  );
+          ));
 }
