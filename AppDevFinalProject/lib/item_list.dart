@@ -18,12 +18,39 @@ class ItemListWidget extends StatefulWidget {
 }
 
 class _ItemListWidgetState extends State<ItemListWidget> {
+  void updateQuantity(Item item, int quantity) {
+    setState(() {
+      item.quantity = quantity;
+      int index = widget.selectedItems.indexWhere((selectedItem) =>
+          selectedItem.itemName == item.itemName &&
+          selectedItem.itemType == item.itemType);
+
+      if (index != -1) {
+        // If the item already exists, update its quantity
+        widget.selectedItems[index] = item;
+      } else {
+        // If the item is not found, add it to selectedItems
+        widget.selectedItems.add(item);
+      }
+    });
+  }
+
+  void initState() {
+    super.initState();
+    widget.selectedItems.forEach((element) {
+      print(element.itemName);
+    });
+    // List<Item> bob = widget.selectedItems;
+    // widget.selectedItems.clear();
+    // widget.selectedItems.addAll(bob);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: globals.mainColor,
-          title: Text('Item List'),
+          title: Text('Select Items'),
         ),
         body: Column(
           children: [
@@ -36,9 +63,11 @@ class _ItemListWidgetState extends State<ItemListWidget> {
 
                   return ListTile(
                     title: Text(item.itemName),
+                    subtitle: Text('Quantity: ${item.quantity}'),
                     leading: Checkbox(
                       activeColor: globals.mainColor,
-                      value: isChecked,
+                      value: widget.selectedItems.contains(item),
+                      //can be isCheched
                       onChanged: (value) {
                         setState(() {
                           if (value!) {
@@ -50,81 +79,35 @@ class _ItemListWidgetState extends State<ItemListWidget> {
                         });
                       },
                     ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.remove),
+                          onPressed: () {
+                            if (item.quantity > 1) {
+                              updateQuantity(item, item.quantity - 1);
+                            }
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            updateQuantity(item, item.quantity + 1);
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
             ),
             ElevatedButton(
                 onPressed: () {
-                  addNewItem(context);
+                  Navigator.pop(context);
                 },
-                child: Text("Add new Item")
-            )
+                child: Text("Done"))
           ],
-        )
-    );
+        ));
   }
 }
-
-void addNewItem(BuildContext context) {
-  TextEditingController name = TextEditingController();
-  TextEditingController type = TextEditingController();
-  TextEditingController cost = TextEditingController();
-
-  showDialog(context: context, builder: (BuildContext context) => new AlertDialog(
-    title: Text("Add new Item"),
-    content: Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              controller: name,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Item Name'
-              ),
-
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              controller: type,
-              decoration: InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Item Type'
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-                controller: cost,
-                decoration: InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Item Cost'
-                ),
-                keyboardType: TextInputType.number
-            ),
-          ),
-          ElevatedButton(
-              onPressed: () {
-                if (double.parse(cost.text) > 0){
-                  globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: double.parse(cost.text)));
-                }
-                else{
-                  globals.db.createItem(Item(itemName: name.text, itemType: type.text, itemCost: 0.0));
-                }
-                Navigator.of(context).pop();
-              },
-              child: Text('Add')
-          )
-        ],
-      ),
-    ),
-  )
-  );
-}
-
