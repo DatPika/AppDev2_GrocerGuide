@@ -43,184 +43,217 @@ class _RecipiesPageState extends State<RecipiesPage> {
     recipeCollection.snapshots();
     return Scaffold(
         body: Center(
-          child: Column(
-            children: [
-              Expanded(
-                child: FutureBuilder<List<RecipiesList>>(
-                  future: getAllRecipe(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (c, index) {
-                            return Card(
-                              elevation: 2,
-                              margin: const EdgeInsets.all(10),
+      child: Column(
+        children: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Recipes',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Here are the recipes that you can create that will allow you prepare with all the things you need!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          Expanded(
+              child: FutureBuilder<List<RecipiesList>>(
+            future: getAllRecipe(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (c, index) {
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            Image.network(
+                              snapshot.data![index].imageURL,
+                              width: 400,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(10),
                               child: Column(
                                 children: [
-                                  Image.network(
-                                    snapshot.data![index].imageURL,
-                                    width: 400,
-                                    height: 150,
-                                    fit: BoxFit.cover,
+                                  Text(
+                                    snapshot.data![index].title,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          snapshot.data![index].title,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    snapshot.data![index].description,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RecipeDetailPage(
+                                            recipe: snapshot.data![index],
                                           ),
                                         ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          snapshot.data![index].description,
-                                          style: const TextStyle(fontSize: 16),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => RecipeDetailPage(
-                                                  recipe: snapshot.data![index],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: const Text('More'),
-                                        ),
-                                      ],
-                                    ),
-                                  )
+                                      );
+                                    },
+                                    child: const Text('More'),
+                                  ),
                                 ],
                               ),
-                            );
-                          },
-                        );
-                      }
-                    }
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              }
 
-                    return Center(
-                        child: CircularProgressIndicator(color: globals.mainColor));
-                  },
-                )
-              ),
-              ElevatedButton(
-                style: ButtonStyle(),
-                onPressed: () async {
-                  ItemsList? selectedList;
-                  List<ItemsList> existingLists = [];
-                  ItemsList list;
+              return Center(
+                  child: CircularProgressIndicator(color: globals.mainColor));
+            },
+          )),
+          ElevatedButton(
+              style: ButtonStyle(),
+              onPressed: () async {
+                ItemsList? selectedList;
+                List<ItemsList> existingLists = [];
+                ItemsList list;
 
-                  Future<void> loadLists() async {
-                    List<ItemsList> lists = await globals.db.allItemsList();
-                    setState(() {
-                      existingLists = lists;
-                    });
-                  }
+                Future<void> loadLists() async {
+                  List<ItemsList> lists = await globals.db.allItemsList();
+                  setState(() {
+                    existingLists = lists;
+                  });
+                }
 
-                  loadLists();
+                loadLists();
 
-                  TextEditingController title = TextEditingController();
-                  TextEditingController description = TextEditingController();
-                  TextEditingController instructions = TextEditingController();
-                  TextEditingController imageURL = TextEditingController(text: 'https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-03/plant-based-food-mc-220323-02-273c7b.jpg');
+                TextEditingController title = TextEditingController();
+                TextEditingController description = TextEditingController();
+                TextEditingController instructions = TextEditingController();
+                TextEditingController imageURL = TextEditingController(
+                    text:
+                        'https://media-cldnry.s-nbcnews.com/image/upload/rockcms/2022-03/plant-based-food-mc-220323-02-273c7b.jpg');
 
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: Text("Add Recipe"),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: title,
-                            decoration: InputDecoration(
-                              labelText: 'Title',
-                            ),
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text("Add Recipe"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: title,
+                          decoration: InputDecoration(
+                            labelText: 'Title',
                           ),
-                          TextField(
-                            controller: description,
-                            decoration: InputDecoration(
-                              labelText: 'Desciption',
-                            ),
+                        ),
+                        TextField(
+                          controller: description,
+                          decoration: InputDecoration(
+                            labelText: 'Desciption',
                           ),
-                          TextField(
-                            controller: instructions,
-                            decoration: InputDecoration(
-                              labelText: 'Instructions',
-                            ),
+                        ),
+                        TextField(
+                          controller: instructions,
+                          decoration: InputDecoration(
+                            labelText: 'Instructions',
                           ),
-                          TextFormField(
-                            controller: imageURL,
-                            decoration: InputDecoration(
-                              labelText: 'Image URL',
-                            ),
+                        ),
+                        TextFormField(
+                          controller: imageURL,
+                          decoration: InputDecoration(
+                            labelText: 'Image URL',
                           ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                // Navigate to ItemListWidget and pass necessary data
-                                selectedList = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ItemListsWidget(
-                                      itemLists: existingLists,
-                                      selectedList: selectedList ?? existingLists[0],
-                                      onListSelected: (selectedList) {
-                                        setState(() {
-                                          list = selectedList;
-                                        });
-                                      },
-                                    ),
+                        ),
+                        ElevatedButton(
+                            onPressed: () async {
+                              // Navigate to ItemListWidget and pass necessary data
+                              selectedList = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ItemListsWidget(
+                                    itemLists: existingLists,
+                                    selectedList:
+                                        selectedList ?? existingLists[0],
+                                    onListSelected: (selectedList) {
+                                      setState(() {
+                                        list = selectedList;
+                                      });
+                                    },
                                   ),
-                                );
-                              },
-                              child: Text("Select items list")
-                          )
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            final recipe = RecipiesList(
+                                ),
+                              );
+                            },
+                            child: Text("Select items list"))
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          final recipe = RecipiesList(
                               title: title.text,
                               description: description.text,
                               imageURL: imageURL.text,
                               instructions: instructions.text,
-                              itemsList: selectedList!
-                            );
-                            globals.db.createRecipiesList(recipe).whenComplete(() {
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, "MyHomePage");
-                            });
-                          },
-                          child: Text('Save', style: TextStyle(color: globals.mainColor),),
-                        ),
-                        TextButton(
-                          onPressed: () {
+                              itemsList: selectedList!);
+                          globals.db
+                              .createRecipiesList(recipe)
+                              .whenComplete(() {
                             Navigator.pop(context);
-                          },
-                          child: Text('Cancel', style: TextStyle(color: globals.mainColor),),
+                            Navigator.pushNamed(context, "MyHomePage");
+                          });
+                        },
+                        child: Text(
+                          'Save',
+                          style: TextStyle(color: globals.mainColor),
                         ),
-                      ],
-                    ),
-                  );
-                },
-                child: Text(
-                  'Add Recipe',
-                  style: TextStyle(fontSize: 24, color: Colors.white),
-                )
-              ),
-            ],
-          ),
-        )
-    );
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(color: globals.mainColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text(
+                'Add Recipe',
+                style: TextStyle(fontSize: 24, color: Colors.white),
+              )),
+        ],
+      ),
+    ));
   }
 }
 
