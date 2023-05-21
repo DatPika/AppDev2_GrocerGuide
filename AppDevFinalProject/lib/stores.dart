@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Model.dart';
 import 'globals.dart' as globals;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 class StoresListsPage extends StatefulWidget {
   const StoresListsPage({Key? key}) : super(key: key);
@@ -157,7 +160,7 @@ class _StoresListsPageState extends State<StoresListsPage> {
                 );
               },
               child: Text("Add new Store"),
-            )
+            ),
           ],
         ),
       ),
@@ -178,6 +181,22 @@ class CardBuild extends StatefulWidget {
 
 class _CardBuildState extends State<CardBuild> {
   bool _isExpanded = false;
+  double latitude = 45.521563;
+  double longitude = -122.677433;
+
+  //I did not have time to implement it anywhere
+
+  void openMap() async {
+    final store = widget.store;
+    final url =
+        'https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}';
+
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not open the map.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +204,7 @@ class _CardBuildState extends State<CardBuild> {
       elevation: 2,
       margin: const EdgeInsets.all(10),
       child: Column(
+
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ExpansionTile(
@@ -239,6 +259,10 @@ class _CardBuildState extends State<CardBuild> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  ElevatedButton(
+                    onPressed: openMap, // Call the openMap method
+                    child: Text("Where is it"),
+                  ),
                   ElevatedButton(
                       onPressed: () async {
                         List<Item> selectedItems = [];
