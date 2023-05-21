@@ -245,6 +245,31 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<Item>> getItemsListByName(String ogName, ItemsList itemsList) async {
+    try {
+      await firestore.collection('itemsList').doc(ogName).delete();
+      await firestore.collection('itemsList').doc(itemsList.itemListTitle).set(itemsList.toJson());
+
+      // Retrieve the updated items list from Firestore
+      final snapshot = await firestore.collection('itemsList').doc(itemsList.itemListTitle).get();
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        if (data != null && data['itemList'] != null) {
+          // Convert the retrieved data to a List of Item objects
+          final itemList = List<Item>.from(data['itemList'].map((item) => Item.fromSnapshot(item)));
+          return itemList;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return []; // Return an empty list if there is an error or no data
+  }
+
+
+
+
   deleteItemsList(String temsListName) async {
     try {
       firestore.collection('itemsList').doc(temsListName).delete();
